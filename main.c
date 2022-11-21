@@ -38,8 +38,8 @@
     to use http (80) as default.
 
     I was tempted to go for an IPv4 P2P model, but with the
-    state of the web these days, most small games are exected
-    to utilise http now if they want to eventually run in a
+    state of the web these days, most small games are expected
+    to utilise http if they want to eventually run in a
     browser, and you skip all the IPv4/IPv6 mess.
 
     Game is limited to 60 FPS because it seemed like a nice
