@@ -215,9 +215,9 @@ void randComet(uint i)
     vMulS(&of, of, randf()*6.f);
     vAdd(&comets[i].pos, comets[i].pos, of);
 
-    comets[i].rot = esRandFloat(0.f, 300.f);
-    comets[i].scale = esRandFloat(0.01f, 0.08f);
-    comets[i].speed = esRandFloat(0.16f, 0.24f);
+    comets[i].rot = randf()*300.f;
+    comets[i].scale = 0.01f+(randf()*0.07f);
+    comets[i].speed = 0.16f+(randf()*0.08f);
 }
 void randComets()
 {
