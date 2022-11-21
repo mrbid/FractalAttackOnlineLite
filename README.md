@@ -3,7 +3,7 @@ An online version of Fractal Attack.
 
 This is a low bandwidth implementation that attempts to setup the same initial game state at the same epoch across all clients using a pseudo random generator for a deterministic simulation.
 
-This means that players only need to transmit their position. Players don't have a direction, but if they did I would infer it from their last position and their new position.
+This means that players only need to transmit their position. Players don't have a facing direction, but if they did I would infer it from their last position and their new position.
 
 #### Single Player version
 - https://snapcraft.io/fractalattack
