@@ -637,6 +637,9 @@ void main_loop()
     }
 
     // players
+    glBindBuffer(GL_ARRAY_BUFFER, mdlRock[2].cid);
+    glVertexAttribPointer(color_id, 3, GL_FLOAT, GL_FALSE, 0, 0);
+    glEnableVertexAttribArray(color_id);
     for(uint i = 0; i < MAX_PLAYERS; i++)
     {
         const uint j = i*3;
@@ -885,7 +888,14 @@ int main(int argc, char** argv)
     // ***** BIND ROCK3 *****
     esBind(GL_ARRAY_BUFFER, &mdlRock[2].vid, rock3_vertices, sizeof(rock3_vertices), GL_STATIC_DRAW);
     esBind(GL_ARRAY_BUFFER, &mdlRock[2].nid, rock3_normals, sizeof(rock3_normals), GL_STATIC_DRAW);
-    //esBind(GL_ARRAY_BUFFER, &mdlRock[2].cid, rock3_colors, sizeof(rock3_colors), GL_STATIC_DRAW);
+    s = rock3_numvert*3;
+    for(GLsizeiptr i = 0; i < s; i+=3)
+    {
+        rock3_colors[i] = 0.f;
+        rock3_colors[i+1] = randf();
+        rock3_colors[i+2] = rock3_colors[i+1]+(randf()*(1.f-rock3_colors[i+1]));
+    }
+    esBind(GL_ARRAY_BUFFER, &mdlRock[2].cid, rock3_colors, sizeof(rock3_colors), GL_STATIC_DRAW);
     esBind(GL_ARRAY_BUFFER, &mdlRock[2].iid, rock3_indices, sizeof(rock3_indices), GL_STATIC_DRAW);
 
     // ***** BIND ROCK4 *****
