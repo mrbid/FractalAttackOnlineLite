@@ -7,17 +7,6 @@
     a icosahedron and then snapping the points to
     a unit sphere; and producing an index buffer
     for each triangle from each subdivision.
-
-    Online
-        Game ID is the start epoch, users register
-        with server before epoch time. Server
-        stores each player by session ID with
-        session data:
-        - Game ID
-        - Player ID (array position)
-        When update position is made server returns
-        player array based on the Game ID of the
-        player that submitted the position.
     
     Get current epoch: date +%s
     Start online game: ./fat <msaa> <future epoch time>
@@ -29,8 +18,8 @@
     the start time accuracy that hangs on the precision
     of the time() function which can be ~0.7s out of sync.
 
-    Players only transmit their positions as a vec3
-    in byte format.
+    Players only transmit a single registration and then
+    their positions as a vec3 in byte format.
 
     Very simple, low bandwidth, requires only a central
     server, no port forwarding required other than port 80
