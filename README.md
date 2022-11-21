@@ -20,10 +20,10 @@ Server should only track 8 player positions per game id.
 
 - **Register** `?r=<game id>`
   
-`game-id` is the unix epoch of when the game starts, after this epoch passes no more registrations should be accepted. The server should assign each registration it's uniqued index from 0-7 and save its `game-id`, preferably as session data.
+`game-id` is the unix epoch of when the game starts, after this epoch passes no more registrations should be accepted. The server should assign each registration it's unique index from 0-7 and save its `game-id`, preferably as session data.
 - **Position** `?p=%00%00%00%00%01%01%01%01%02%02%02%02`
   
-When each player submits a position they will do so via the `p` url parameter as bytecode provided as escaped hex, it will be 3 floats of 4 bytes each. The server should then respond with an array of 7 player positions all of the same `game-id` excluding your own position.
+When each player submits a position they will do so via the `p` url parameter as bytecode provided as escaped hex, it will be 3 floats of 4 bytes each. The server should then respond with an array of 7 player positions as bytecode in their respective unique index order all of the same `game-id` excluding your own position.
 
 ---
 
