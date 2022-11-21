@@ -15,7 +15,7 @@ Here's the fun part, it's a make your own server game *(for now)*. It's not that
 
 ---
 
-### Server
+## Server
 Server should only track 8 player positions per game id.
 
 - **Register** `?r=<game id>`
