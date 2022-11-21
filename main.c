@@ -769,7 +769,7 @@ int main(int argc, char** argv)
 
     // start at epoch
     time_t sepoch = time(0);
-    if(argc >= 3){sepoch = atoi(argv[2]);}
+    if(argc >= 3){sepoch = atoll(argv[2]);}
 
     // help
     printf("----\n");
