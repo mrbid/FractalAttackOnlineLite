@@ -991,8 +991,7 @@ int main(int argc, char** argv)
     // set start time
     start_time = glfwGetTime();
 
-    // seed randoms
-    srand(sepoch);
+    // seed random
     srandf(sepoch);
 
     // set comets
