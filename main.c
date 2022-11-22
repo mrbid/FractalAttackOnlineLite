@@ -839,6 +839,8 @@ int main(int argc, char** argv)
     }
     curl_easy_setopt(curl, CURLOPT_VERBOSE, 0);
     curl_easy_setopt(curl, CURLOPT_TCP_FASTOPEN, 1);
+    curl_easy_setopt(curl, CURLOPT_TCP_NODELAY, 1);
+    curl_easy_setopt(curl, CURLOPT_TCP_KEEPALIVE, 1);
     curl_easy_setopt(curl, CURLOPT_USERAGENT, "fractalattack-agent/1.0");
 
     // register game
