@@ -978,9 +978,10 @@ int main(int argc, char** argv)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glfwSwapBuffers(window);
     glfwSetWindowTitle(window, "Please wait...");
+    //printf("%lu\n%lu\n-\n", (time_t)((double)microtime()*0.000001), time(0));
     while((time_t)((double)microtime()*0.000001) < sepoch)
     {
-        usleep(100); // this reduces the accuracy by the range in microseconds
+        usleep(10000); // this reduces the accuracy by the range in microseconds
         char title[256];
         sprintf(title, "Please wait... %lu seconds.", sepoch-time(0));
         glfwSetWindowTitle(window, title);
