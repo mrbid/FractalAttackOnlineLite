@@ -11,7 +11,7 @@ The PHP server is [fat.php](fat.php).
 
 To start an online game you have to launch as such `./fat <msaa> <start epoch>` the start epoch has to be a future epoch, you can get the current epoch using `date +%s` add 180 seconds to it and tell your friends to also launch using that epoch and you will all endup in the same game. msaa is optional between 0-16.
 
-Removing players bouncing off asteroids would probably completely eliminate any failed asteroid collisions across all clients, but it's less cool if players dont collide with asteroids and the current failed collision rate isn't that high.
+Removing players bouncing off asteroids would probably completely eliminate any failed asteroid collisions across all clients, but it's less cool if players dont collide with asteroids and the current failed collision rate isn't that high. The result would be that players pass through asteroids to destroy them which would give all clients more time to detect their position within the asteroid radius than if they quickly bounced off them as they do now.
 
 #### Single Player version
 - https://snapcraft.io/fractalattack
