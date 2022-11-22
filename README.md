@@ -7,7 +7,7 @@ This means that players only need to transmit their position. Players don't have
 
 The Asteroids move quite slowly so being even a second or two out of sync would not be that bad, but reducing the speed even more compensates for higher deviations between clients.
 
-Here's the fun part, it's a make your own server game *(for now)*. It's not that hard, have fun!
+The PHP server is [fat.php](fat.php).
 
 #### Single Player version
 - https://snapcraft.io/fractalattack
