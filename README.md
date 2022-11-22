@@ -21,6 +21,9 @@ Ultimately IPv4 UDP at 144hz is the holy grail. 🙇
 
 <details>
     <summary>Server</summary>
+
+### Server
+
 Server should only track 8 player positions per game id.
 
 - **Register** `?r=<game id>`
