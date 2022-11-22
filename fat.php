@@ -1,5 +1,7 @@
 <?php
 
+    # https://github.com/mrbid/FractalAttackOnline
+
     if(!isset($_GET['u']) || !isset($_GET['r']))
     {
         //echo "uid (u) or game-id (r) not provided";
@@ -36,7 +38,8 @@
     {
         if(time() > $_GET['r'])
         {
-            echo "registration rejected: time period expired";
+            //echo "registration rejected: time period expired";
+            header("HTTP/1.1 200 OK");
             exit;
         }
         if(is_dir($_GET['r']) == true)
@@ -44,13 +47,15 @@
             $ar = glob($_GET['r'] . '/*');
             if(count($ar) >= 8)
             {
-                echo "registration rejected: max players reached";
+                //echo "registration rejected: max players reached";
+                header("HTTP/1.1 200 OK");
                 exit;
             }
         }
         if(file_exists($_GET['r'] . "/" . $_GET['u']) == true)
         {
-            echo "registration rejected: already registered";
+            //echo "registration rejected: already registered";
+            header("HTTP/1.1 200 OK");
             exit;
         }
         mkdir($_GET['r']);
