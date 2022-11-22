@@ -16,7 +16,7 @@
     all systems with a small amount of deviation over
     time due to the accuracy of dt (unavoidable) and
     the start time accuracy that hangs on the precision
-    of the time() function which can be ~0.7s out of sync.
+    of the microtime function.
 
     Players only transmit a single registration and then
     their positions as a vec3 in byte format.
@@ -51,12 +51,14 @@
 #include <string.h>
 #include <time.h>
 
+#include <sys/time.h>
+#include <sys/file.h>
 #include <unistd.h>
 #include <curl/curl.h>
 CURL *curl;
 
 #define uint GLuint
-#define sint GLshort
+#define sint GLint
 #define f32 GLfloat
 
 #include "inc/gl.h"
@@ -158,6 +160,22 @@ void timestamp(char* ts)
     const time_t tt = time(0);
     strftime(ts, 16, "%H:%M:%S", localtime(&tt));
 }
+uint64_t microtime()
+{
+    struct timeval tv;
+    struct timezone tz;
+    memset(&tz, 0, sizeof(struct timezone));
+    gettimeofday(&tv, &tz);
+    return 1000000 * tv.tv_sec + tv.tv_usec;
+}
+unsigned short urand16()
+{
+    int f = open("/dev/urandom", O_RDONLY | O_CLOEXEC);
+    unsigned short s = 0;
+    read(f, &s, sizeof(unsigned short));
+    close(f);
+    return s;
+}
 void scaleBuffer(GLfloat* b, GLsizeiptr s)
 {
     for(GLsizeiptr i = 0; i < s; i++)
@@ -236,27 +254,27 @@ void incrementHits()
 
 static size_t cb(void *data, size_t size, size_t nmemb, void *p)
 {
-    if(nmemb == 84){memcpy(&players, data, 84);}
+    if(nmemb > 0 && nmemb <= 84){memcpy(&players, data, nmemb);}
     return 0;
 }
-void curlUpdateGame()
+void curlUpdateGame(const time_t sepoch, const unsigned short uid)
 {
     // might want to add a cache buster to the url
     unsigned char d[12];
     memcpy(&d, (unsigned char*)&ppr, 12);
     char url[256];
-    sprintf(url, "http://vfcash.co.uk/fat.php?p=%%%02X%%%02X%%%02X%%%02X%%%02X%%%02X%%%02X%%%02X%%%02X%%%02X%%%02X%%%02X", d[0], d[1], d[2], d[3], d[4], d[5], d[6], d[7], d[8], d[9], d[10], d[11]);
+    sprintf(url, "http://vfcash.co.uk/fat/fat.php?r=%lu&u=%hu&p=%%%02X%%%02X%%%02X%%%02X%%%02X%%%02X%%%02X%%%02X%%%02X%%%02X%%%02X%%%02X", sepoch, uid, d[0], d[1], d[2], d[3], d[4], d[5], d[6], d[7], d[8], d[9], d[10], d[11]);
     //printf("%s\n", url);
     curl_easy_setopt(curl, CURLOPT_URL, url);
     curl_easy_setopt(curl, CURLOPT_TIMEOUT_MS, 16);
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, cb);
     curl_easy_perform(curl);
 }
-void curlRegisterGame(time_t sepoch)
+void curlRegisterGame(const time_t sepoch, const unsigned short uid)
 {
     // might want to add a cache buster to the url
     char url[256];
-    sprintf(url, "http://vfcash.co.uk/fat.php?r=%lu", sepoch);
+    sprintf(url, "http://vfcash.co.uk/fat/fat.php?r=%lu&u=%hu", sepoch, uid);
     curl_easy_setopt(curl, CURLOPT_URL, url);
     curl_easy_setopt(curl, CURLOPT_TIMEOUT_MS, time(0)-sepoch);
 
@@ -693,6 +711,12 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
             printf("%+.2f %+.2f %+.2f %+.2f\n", view.m[2][0], view.m[2][1], view.m[2][2], view.m[2][3]);
             printf("%+.2f %+.2f %+.2f %+.2f\n", view.m[3][0], view.m[3][1], view.m[3][2], view.m[3][3]);
             printf("---\n");
+
+            // randomly dump an online player at your position
+            // const uint j = esRand(0, 6)*3;
+            // players[j] = ppr.x;
+            // players[j+1] = ppr.y;
+            // players[j+2] = ppr.z;
         }
     }
     else if(action == GLFW_RELEASE)
@@ -763,6 +787,9 @@ int main(int argc, char** argv)
     time_t sepoch = time(0);
     if(argc >= 3){sepoch = atoll(argv[2]);}
 
+    // gen client UID
+    const unsigned short uid = urand16();
+
     // help
     printf("----\n");
     printf("Online Fractal Attack\n");
@@ -773,6 +800,9 @@ int main(int argc, char** argv)
     printf("F = FPS to console.\n");
     printf("W, A, S, D, SPACE, LEFT SHIFT\n");
     printf("Right Click to Brake\n");
+    printf("----\n");
+    printf("epotch: %lu\n", sepoch);
+    printf("uid: %hu\n", uid);
     printf("----\n");
 
     // init glfw
@@ -810,7 +840,7 @@ int main(int argc, char** argv)
     curl_easy_setopt(curl, CURLOPT_USERAGENT, "fractalattack-agent/1.0");
 
     // register game
-    curlRegisterGame(sepoch);
+    curlRegisterGame(sepoch, uid);
 
 //*************************************
 // projection
@@ -948,9 +978,9 @@ int main(int argc, char** argv)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glfwSwapBuffers(window);
     glfwSetWindowTitle(window, "Please wait...");
-    while(time(0) < sepoch) // time() is not super accurate
+    while((time_t)((double)microtime()*0.000001) < sepoch)
     {
-        usleep(100); // this reduces the accuracy again by the range in microseconds
+        usleep(sepoch-((time_t)((double)microtime()*0.000001))); // this reduces the accuracy by the range in microseconds
         char title[256];
         sprintf(title, "Please wait... %lu seconds.", sepoch-time(0));
         glfwSetWindowTitle(window, title);
@@ -981,7 +1011,7 @@ int main(int argc, char** argv)
         t = glfwGetTime();
         
         // tick internal state
-        curlUpdateGame();
+        curlUpdateGame(sepoch, uid);
         glfwPollEvents();
         main_loop();
 
