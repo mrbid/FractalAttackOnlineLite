@@ -13,7 +13,7 @@ To start an online game you have to launch as such `./fat <msaa> <start epoch>` 
 
 Removing players bouncing off asteroids would probably completely eliminate any failed asteroid collisions across all clients, but it's less cool if players dont collide with asteroids and the current failed collision rate isn't that high. The result would be that players pass through asteroids to destroy them which would give all clients more time to detect their position within the asteroid radius than if they quickly bounced off them as they do now.
 
-Ultimately IPv4 UDP at 144hz is the holy grail.
+Ultimately IPv4 UDP at 144hz is the holy grail. 😇
 
 #### Single Player version
 - https://snapcraft.io/fractalattack
