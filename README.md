@@ -9,6 +9,8 @@ The Asteroids move quite slowly so being even a second or two out of sync would 
 
 The PHP server is [fat.php](fat.php).
 
+To start an online game you have to launch as such `./fat <msaa> <start epoch>` the start epoch has to be a future epoch, you can get the current epoch using `date +%s` add 180 seconds to it and tell your friends to also launch using that epoch and you will all endup in the same game. msaa is optional between 0-16.
+
 #### Single Player version
 - https://snapcraft.io/fractalattack
 - https://github.com/mrbid/FractalAttack
