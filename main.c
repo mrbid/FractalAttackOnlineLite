@@ -293,8 +293,8 @@ void curlRegisterGame(const time_t sepoch, const unsigned short uid)
 }
 void *netThread(void *arg)
 {
-    useconds_t wait = high_ping*1000;
-    if(wait < 10000){wait = 10000;}
+    useconds_t wait = high_ping*1000; // ms to µs
+    if(wait < 10000){wait = 10000;} // 10 ms min loop time
     while(1)
     {
         usleep(wait);
