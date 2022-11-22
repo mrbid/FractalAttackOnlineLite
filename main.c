@@ -980,7 +980,7 @@ int main(int argc, char** argv)
     glfwSetWindowTitle(window, "Please wait...");
     while((time_t)((double)microtime()*0.000001) < sepoch)
     {
-        usleep(sepoch-((time_t)((double)microtime()*0.000001))); // this reduces the accuracy by the range in microseconds
+        usleep(100); // this reduces the accuracy by the range in microseconds
         char title[256];
         sprintf(title, "Please wait... %lu seconds.", sepoch-time(0));
         glfwSetWindowTitle(window, title);
