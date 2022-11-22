@@ -1,2 +1,2 @@
-clang main.c glad_gl.c -I inc -Ofast -lglfw -lcurl -lm -o fat
+clang main.c glad_gl.c -I inc -Ofast -lglfw -lpthread -lcurl -lm -o fat
 ./fat
