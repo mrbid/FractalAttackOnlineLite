@@ -276,7 +276,7 @@ void curlRegisterGame(const time_t sepoch, const unsigned short uid)
     char url[256];
     sprintf(url, "http://vfcash.co.uk/fat/fat.php?r=%lu&u=%hu", sepoch, uid);
     curl_easy_setopt(curl, CURLOPT_URL, url);
-    curl_easy_setopt(curl, CURLOPT_TIMEOUT_MS, time(0)-sepoch);
+    curl_easy_setopt(curl, CURLOPT_TIMEOUT, time(0)-sepoch);
 
     FILE *devnull = fopen("/dev/null", "w+");
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, devnull);
@@ -838,6 +838,7 @@ int main(int argc, char** argv)
         exit(EXIT_FAILURE);
     }
     curl_easy_setopt(curl, CURLOPT_VERBOSE, 0);
+    curl_easy_setopt(curl, CURLOPT_TCP_FASTOPEN, 1);
     curl_easy_setopt(curl, CURLOPT_USERAGENT, "fractalattack-agent/1.0");
 
     // register game
