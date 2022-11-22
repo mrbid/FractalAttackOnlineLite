@@ -656,7 +656,7 @@ void main_loop()
             for(uint k = 0; k < NUM_COMETS; k++)
             {
                 const f32 cd = vDist((vec){-players[j], -players[j+1], -players[j+2]}, comets[k].pos);
-                const f32 cs = comets[i].scale+0.07f; // online players get more leeway
+                const f32 cs = comets[i].scale+0.06f;
                 if(cd < cs)
                 {
                     comets[k].speed = 0.f;
