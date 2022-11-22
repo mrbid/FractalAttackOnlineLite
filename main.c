@@ -261,6 +261,7 @@ void curlUpdateGame(const time_t sepoch, const unsigned short uid);
 static size_t cb(void *data, size_t size, size_t nmemb, void *p)
 {
     if(nmemb > 0 && nmemb <= 84){memcpy(&players, data, nmemb);}
+    last_update = time(0);
     curlUpdateGame(sepoch, uid);
     return 0;
 }
