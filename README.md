@@ -1,15 +1,15 @@
 # FractalAttackOnline
 An online version of Fractal Attack.
 
-⭐ This is a low bandwidth implementation that attempts to setup the same initial game state at the same epoch across all clients using a custom pseudo random generator for a deterministic simulation.
+This is a low bandwidth implementation that attempts to setup the same initial game state at the same epoch across all clients using a custom pseudo random generator for a deterministic simulation.
 
-🗣️ This means that players only need to transmit their position. Players don't have a facing direction, but if they did I would infer it from their last position and their new position.
+This means that players only need to transmit their position. Players don't have a facing direction, but if they did I would infer it from their last position and their new position.
 
-ℹ️ The Asteroids move quite slowly so being even a second or two out of sync would not be that bad, but reducing the speed even more compensates for higher deviations between clients.
+The Asteroids move quite slowly so being even a second or two out of sync would not be that bad, but reducing the speed even more compensates for higher deviations between clients.
 
-⚙️ The PHP server is [fat.php](fat.php).
+The PHP server is [fat.php](fat.php).
 
-🏁 To start an online game you have to launch as such `./fat <msaa> <start epoch>` the start epoch has to be a future epoch, you can get the current epoch using `date +%s` add 180 seconds to it and tell your friends to also launch using that epoch and you will all endup in the same game. msaa is optional between 0-16.
+To start an online game you have to launch as such `./fat <msaa> <start epoch>` the start epoch has to be a future epoch, you can get the current epoch using `date +%s` add 180 seconds to it and tell your friends to also launch using that epoch and you will all endup in the same game. msaa is optional between 0-16.
 
 Removing players bouncing off asteroids would probably completely eliminate any failed asteroid collisions across all clients, but it's less cool if players dont collide with asteroids and the current failed collision rate isn't that high. The result would be that players pass through asteroids to destroy them which would give all clients more time to detect their position within the asteroid radius than if they quickly bounced off them as they do now.
 
