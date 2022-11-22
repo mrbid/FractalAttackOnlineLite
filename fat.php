@@ -2,7 +2,8 @@
 
     if(!isset($_GET['u']) || !isset($_GET['r']))
     {
-        echo "uid (u) or game-id (r) not provided";
+        //echo "uid (u) or game-id (r) not provided";
+        header("HTTP/1.1 200 OK");
         exit;
     }
     $_GET['u'] = intval($_GET['u']);
