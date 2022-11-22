@@ -293,6 +293,7 @@ void main_loop()
 // time delta for frame interpolation
 //*************************************
     static double lt = 0;
+    if(lt == 0){lt = t;}
     dt = t-lt;
     lt = t;
 
@@ -981,7 +982,7 @@ int main(int argc, char** argv)
     //printf("%lu\n%lu\n-\n", (time_t)((double)microtime()*0.000001), time(0));
     while((time_t)((double)microtime()*0.000001) < sepoch)
     {
-        usleep(10000); // this reduces the accuracy by the range in microseconds
+        usleep(1000); // this reduces the accuracy by the range in microseconds
         char title[256];
         sprintf(title, "Please wait... %lu seconds.", sepoch-time(0));
         glfwSetWindowTitle(window, title);
