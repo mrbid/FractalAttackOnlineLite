@@ -1,5 +1,6 @@
 # FractalAttackOnline
 ### Defend the planet until it reaches 100% damage!
+*Play with upto 8 players online.*
 
 This is a low bandwidth implementation that attempts to setup the same initial game state at the same epoch across all clients using a custom pseudo random generator for a deterministic simulation.
 
