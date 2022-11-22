@@ -51,6 +51,7 @@
 #include <string.h>
 #include <time.h>
 
+#include <pthread.h>
 #include <sys/time.h>
 #include <sys/file.h>
 #include <unistd.h>
@@ -141,6 +142,9 @@ uint brake = 0;
 uint damage = 0;
 double start_time = 0.0;
 uint high_ping = 0;
+time_t sepoch = 0;
+unsigned short uid = 0;
+time_t last_update = 0;
 
 #define MAX_PLAYERS 7
 float players[MAX_PLAYERS*3] = {0};
@@ -253,9 +257,11 @@ void incrementHits()
     }
 }
 
+void curlUpdateGame(const time_t sepoch, const unsigned short uid);
 static size_t cb(void *data, size_t size, size_t nmemb, void *p)
 {
     if(nmemb > 0 && nmemb <= 84){memcpy(&players, data, nmemb);}
+    curlUpdateGame(sepoch, uid);
     return 0;
 }
 void curlUpdateGame(const time_t sepoch, const unsigned short uid)
@@ -283,6 +289,16 @@ void curlRegisterGame(const time_t sepoch, const unsigned short uid)
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, devnull);
     curl_easy_perform(curl);
     fclose(devnull);
+}
+void *netThread(void *arg)
+{
+    const useconds_t wait = high_ping*1000;
+    while(1)
+    {
+        usleep(wait);
+        if(time(0)-last_update > high_ping)
+            curlUpdateGame(sepoch, uid);
+    }
 }
 
 //*************************************
@@ -556,11 +572,11 @@ void main_loop()
             }
 
             // player impact
-            if(high_ping == 0)
+            const f32 cd = vDist((vec){-ppr.x, -ppr.y, -ppr.z}, comets[i].pos);
+            const f32 cs = comets[i].scale+0.06f;
+            if(cd < cs)
             {
-                const f32 cd = vDist((vec){-ppr.x, -ppr.y, -ppr.z}, comets[i].pos);
-                const f32 cs = comets[i].scale+0.06f;
-                if(cd < cs)
+                if(high_ping == 0)
                 {
                     vec n = ppr;
                     vNorm(&n);
@@ -573,11 +589,11 @@ void main_loop()
 
                     vReflect(&pp, pp, ccd);
                     vMulS(&pp, pp, 0.3f);
-
-                    comets[i].speed = 0.f;
-                    comets[i].dir.x = 1.f;
-                    //comets[i].scale *= 2.f;
                 }
+
+                comets[i].speed = 0.f;
+                comets[i].dir.x = 1.f;
+                //comets[i].scale *= 2.f;
             }
 
             // flip to grey if red
@@ -694,6 +710,7 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
         else if(key == GLFW_KEY_S){ keystate[3] = 1; }
         else if(key == GLFW_KEY_SPACE){ keystate[4] = 1; }
         else if(key == GLFW_KEY_LEFT_SHIFT){ keystate[5] = 1; }
+        else if(key == GLFW_KEY_LEFT_CONTROL){ brake = 1; }
         else if(key == GLFW_KEY_F)
         {
             if(t-lfct > 2.0)
@@ -732,6 +749,7 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
         else if(key == GLFW_KEY_S){ keystate[3] = 0; }
         else if(key == GLFW_KEY_SPACE){ keystate[4] = 0; }
         else if(key == GLFW_KEY_LEFT_SHIFT){ keystate[5] = 0; }
+        else if(key == GLFW_KEY_LEFT_CONTROL){ brake = 0; }
     }
 }
 
@@ -789,7 +807,7 @@ int main(int argc, char** argv)
     if(argc >= 2){msaa = atoi(argv[1]);}
 
     // start at epoch
-    time_t sepoch = time(0);
+    sepoch = time(0);
     if(argc >= 3){sepoch = atoll(argv[2]);}
 
     // high ping flag
@@ -797,7 +815,7 @@ int main(int argc, char** argv)
     if(high_ping > 0 && (high_ping <= 16 || high_ping > 333)){high_ping = 333;}
 
     // gen client UID
-    const unsigned short uid = urand16();
+    uid = urand16();
 
     // help
     printf("----\n");
@@ -812,6 +830,7 @@ int main(int argc, char** argv)
     printf("----\n");
     printf("epotch: %lu\n", sepoch);
     printf("uid: %hu\n", uid);
+    printf("high ping: %u\n", high_ping);
     printf("----\n");
 
     // init glfw
@@ -850,6 +869,14 @@ int main(int argc, char** argv)
     curl_easy_setopt(curl, CURLOPT_TCP_NODELAY, 1);
     curl_easy_setopt(curl, CURLOPT_TCP_KEEPALIVE, 1);
     curl_easy_setopt(curl, CURLOPT_USERAGENT, "fractalattack-agent/1.0");
+
+    // create network thread
+    pthread_t tid;
+    if(pthread_create(&tid, NULL, netThread, NULL) != 0)
+    {
+        printf("pthread_create() failed.");
+        return 0;
+    }
 
     // register game
     curlRegisterGame(sepoch, uid);
@@ -1023,7 +1050,6 @@ int main(int argc, char** argv)
         t = glfwGetTime();
         
         // tick internal state
-        curlUpdateGame(sepoch, uid);
         glfwPollEvents();
         main_loop();
 
