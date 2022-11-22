@@ -14,6 +14,8 @@ Removing players bouncing off asteroids would probably completely eliminate any 
 
 Ultimately IPv4 UDP at 144hz is the holy grail. 🙇
 
+### If you can't ping the server in under 16ms then you won't be able to play basically
+
 #### Single Player version
 - https://snapcraft.io/fractalattack
 - https://github.com/mrbid/FractalAttack
