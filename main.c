@@ -971,18 +971,9 @@ int main(int argc, char** argv)
     t = glfwGetTime();
     lfct = t;
     
-    // event loop
-    // while(!glfwWindowShouldClose(window))
-    // {
-    //     t = glfwGetTime();
-    //     glfwPollEvents();
-    //     main_loop();
-    //     fc++;
-    // }
-
     // fps accurate event loop
     const double maxfps = 60.0;
-    useconds_t wait_interval = 1000000 / maxfps; // fixed timestep
+    useconds_t wait_interval = 1000000 / maxfps;
     useconds_t wait = wait_interval;
     while(!glfwWindowShouldClose(window))
     {
