@@ -19,7 +19,8 @@ Ultimately IPv4 UDP at 144hz is the holy grail. 🙇
 
 ---
 
-## Server
+<details>
+    <summary>Server</summary>
 Server should only track 8 player positions per game id.
 
 - **Register** `?r=<game id>`
@@ -30,6 +31,7 @@ Server should only track 8 player positions per game id.
 When each player submits a position they will do so via the `p` url parameter as bytecode provided as escaped hex, it will be 3 floats of 4 bytes each. The server should then respond with an array of 7 player positions as bytecode in any order as long as they are all of the same `game-id` and excluding the position of the player that made the request.
 
 All you really need to do is update the player position bytecode on `p`, you don't need to format it just store it, and then just spit them back out with all the other player position bytecodes in one long string of bytecodes but remembering to exclude the players own position bytecode.
+</details>
 
 ---
 
