@@ -140,6 +140,7 @@ uint hits = 0;
 uint brake = 0;
 uint damage = 0;
 double start_time = 0.0;
+uint high_ping = 0;
 
 #define MAX_PLAYERS 7
 float players[MAX_PLAYERS*3] = {0};
@@ -266,7 +267,7 @@ void curlUpdateGame(const time_t sepoch, const unsigned short uid)
     sprintf(url, "http://vfcash.co.uk/fat/fat.php?r=%lu&u=%hu&p=%%%02X%%%02X%%%02X%%%02X%%%02X%%%02X%%%02X%%%02X%%%02X%%%02X%%%02X%%%02X", sepoch, uid, d[0], d[1], d[2], d[3], d[4], d[5], d[6], d[7], d[8], d[9], d[10], d[11]);
     //printf("%s\n", url);
     curl_easy_setopt(curl, CURLOPT_URL, url);
-    curl_easy_setopt(curl, CURLOPT_TIMEOUT_MS, 16);
+    curl_easy_setopt(curl, CURLOPT_TIMEOUT_MS, high_ping);
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, cb);
     curl_easy_perform(curl);
 }
@@ -555,25 +556,28 @@ void main_loop()
             }
 
             // player impact
-            const f32 cd = vDist((vec){-ppr.x, -ppr.y, -ppr.z}, comets[i].pos);
-            const f32 cs = comets[i].scale+0.06f;
-            if(cd < cs)
+            if(high_ping == 0)
             {
-                vec n = ppr;
-                vNorm(&n);
-                vMulS(&n, n, cs-cd);
-                vAdd(&ppr, ppr, n);
+                const f32 cd = vDist((vec){-ppr.x, -ppr.y, -ppr.z}, comets[i].pos);
+                const f32 cs = comets[i].scale+0.06f;
+                if(cd < cs)
+                {
+                    vec n = ppr;
+                    vNorm(&n);
+                    vMulS(&n, n, cs-cd);
+                    vAdd(&ppr, ppr, n);
 
-                vec ccd = comets[i].pos;
-                vSub(&ccd, ppr, ccd);
-                vNorm(&ccd);
+                    vec ccd = comets[i].pos;
+                    vSub(&ccd, ppr, ccd);
+                    vNorm(&ccd);
 
-                vReflect(&pp, pp, ccd);
-                vMulS(&pp, pp, 0.3f);
+                    vReflect(&pp, pp, ccd);
+                    vMulS(&pp, pp, 0.3f);
 
-                comets[i].speed = 0.f;
-                comets[i].dir.x = 1.f;
-                //comets[i].scale *= 2.f;
+                    comets[i].speed = 0.f;
+                    comets[i].dir.x = 1.f;
+                    //comets[i].scale *= 2.f;
+                }
             }
 
             // flip to grey if red
@@ -788,6 +792,10 @@ int main(int argc, char** argv)
     time_t sepoch = time(0);
     if(argc >= 3){sepoch = atoll(argv[2]);}
 
+    // high ping flag
+    if(argc >= 4){high_ping = atoi(argv[3]);}
+    if(high_ping > 0 && (high_ping <= 16 || high_ping > 333)){high_ping = 333;}
+
     // gen client UID
     const unsigned short uid = urand16();
 
@@ -797,7 +805,7 @@ int main(int argc, char** argv)
     printf("----\n");
     printf("James William Fletcher (github.com/mrbid)\n");
     printf("----\n");
-    printf("Argv(2): msaa, start epoch\n");
+    printf("Argv(2): msaa 0-16, start epoch, high ping 0-333\n");
     printf("F = FPS to console.\n");
     printf("W, A, S, D, SPACE, LEFT SHIFT\n");
     printf("Right Click to Brake\n");
