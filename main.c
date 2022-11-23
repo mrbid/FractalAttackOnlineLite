@@ -143,10 +143,11 @@ uint hits = 0;
 uint brake = 0;
 uint damage = 0;
 double start_time = 0.0;
-uint high_ping = 0;
 time_t sepoch = 0;
 unsigned short uid = 0;
-uint last_update = 0;
+uint latency = 1000; // start at 1s
+uint timeout = 1333; // 1s + 1/3s
+uint slat = 0;
 
 #define MAX_PLAYERS 7
 float players[MAX_PLAYERS*3] = {0};
@@ -266,9 +267,8 @@ void incrementHits()
 void curlUpdateGame(const time_t sepoch, const unsigned short uid);
 static size_t cb(void *data, size_t size, size_t nmemb, void *p)
 {
+    latency = millitime()-slat;
     if(nmemb > 0 && nmemb <= 84){memcpy(&players, data, nmemb);}
-    last_update = millitime();
-    curlUpdateGame(sepoch, uid);
     return 0;
 }
 void curlUpdateGame(const time_t sepoch, const unsigned short uid)
@@ -280,8 +280,9 @@ void curlUpdateGame(const time_t sepoch, const unsigned short uid)
     sprintf(url, "http://vfcash.co.uk/fat/fat.php?r=%lu&u=%hu&p=%%%02X%%%02X%%%02X%%%02X%%%02X%%%02X%%%02X%%%02X%%%02X%%%02X%%%02X%%%02X", sepoch, uid, d[0], d[1], d[2], d[3], d[4], d[5], d[6], d[7], d[8], d[9], d[10], d[11]);
     //printf("%s\n", url);
     curl_easy_setopt(curl, CURLOPT_URL, url);
-    curl_easy_setopt(curl, CURLOPT_TIMEOUT_MS, high_ping);
+    curl_easy_setopt(curl, CURLOPT_TIMEOUT_MS, latency+(latency/3));
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, cb);
+    slat = millitime();
     curl_easy_perform(curl);
 }
 void curlRegisterGame(const time_t sepoch, const unsigned short uid)
@@ -299,16 +300,10 @@ void curlRegisterGame(const time_t sepoch, const unsigned short uid)
 }
 void *netThread(void *arg)
 {
-    useconds_t wait = high_ping*1000; // ms to µs
-    if(wait < 10000){wait = 10000;} // 10 ms min loop time (should be 16 but lets try to stay ahead of the curve)
     while(1)
     {
-        usleep(wait);
-        if(millitime()-last_update > high_ping)
-        {
-            curlUpdateGame(sepoch, uid);
-            last_update = time(0);
-        }
+        usleep(latency*1000); // ms to µs
+        curlUpdateGame(sepoch, uid);
     }
 }
 
@@ -587,7 +582,7 @@ void main_loop()
             const f32 cs = comets[i].scale+0.06f;
             if(cd < cs)
             {
-                if(high_ping == 0)
+                if(latency <= 16)
                 {
                     vec n = ppr;
                     vNorm(&n);
@@ -821,10 +816,6 @@ int main(int argc, char** argv)
     sepoch = time(0);
     if(argc >= 3){sepoch = atoll(argv[2]);}
 
-    // high ping flag
-    if(argc >= 4){high_ping = atoi(argv[3]);}
-    if(high_ping > 0 && (high_ping <= 16 || high_ping > 333)){high_ping = 333;}
-
     // gen client UID
     uid = urand16();
 
@@ -841,7 +832,6 @@ int main(int argc, char** argv)
     printf("----\n");
     printf("epotch: %lu\n", sepoch);
     printf("uid: %hu\n", uid);
-    printf("high ping: %u\n", high_ping);
     printf("----\n");
 
     // init glfw
