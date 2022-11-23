@@ -74,6 +74,12 @@ CURL *curl;
 
 #define SEIR_RAND
 
+#define HAX
+
+#ifdef HAX
+    #define MIN_UPDATE_TIME 10000
+#endif
+
 #include "inc/esAux2.h"
 #include "inc/res.h"
 #include "assets/ncube.h"
@@ -302,8 +308,16 @@ void *netThread(void *arg)
 {
     while(1)
     {
+#ifdef HAX
+        const uint64_t last_update = microtime();
+        curlUpdateGame(sepoch, uid);
+        const uint64_t this_time = microtime();
+        if(this_time-last_update < MIN_UPDATE_TIME)
+            usleep(this_time+MIN_UPDATE_TIME-last_update);
+#else
         usleep(latency*1000); // ms to µs
         curlUpdateGame(sepoch, uid);
+#endif
     }
 }
 
