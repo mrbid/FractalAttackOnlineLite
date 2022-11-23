@@ -712,6 +712,16 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
                 fc = 0;
             }
         }
+        else if(key == GLFW_KEY_ESCAPE)
+        {
+            focus_cursor = 1 - focus_cursor;
+            if(focus_cursor == 0)
+                glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+            else
+                glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+            glfwSetCursorPos(window, ww2, wh2);
+            glfwGetCursorPos(window, &ww2, &wh2);
+        }
         else if(key == GLFW_KEY_V)
         {
             // view inversion
