@@ -74,12 +74,6 @@ CURL *curl;
 
 #define SEIR_RAND
 
-#define HAX
-
-#ifdef HAX
-    #define MIN_UPDATE_TIME 10000
-#endif
-
 #include "inc/esAux2.h"
 #include "inc/res.h"
 #include "assets/ncube.h"
@@ -142,6 +136,8 @@ f32 xrot = 0.f, yrot = 0.f;
 // game vars
 #define GFX_SCALE 0.01f
 #define MOVE_SPEED 0.003f
+#define MIN_UPDATE_TIME_US 10000
+#define UPDATE_TIMEOUT_MS 1000
 uint keystate[6] = {0};
 vec pp = {0.f, 0.f, 0.f};
 vec ppr = {0.f, 0.f, -2.3f};
@@ -151,9 +147,6 @@ uint damage = 0;
 double start_time = 0.0;
 time_t sepoch = 0;
 unsigned short uid = 0;
-uint latency = 1000; // start at 1s
-uint timeout = 1333; // 1s + 1/3s
-uint slat = 0;
 
 #define MAX_PLAYERS 7
 float players[MAX_PLAYERS*3] = {0};
@@ -272,8 +265,6 @@ void incrementHits()
 
 static size_t cb(void *data, size_t size, size_t nmemb, void *p)
 {
-    latency = millitime()-slat;
-    timeout = latency+(latency/3);
     if(nmemb > 0 && nmemb <= 84){memcpy(&players, data, nmemb);}
     return 0;
 }
@@ -286,9 +277,8 @@ void curlUpdateGame(const time_t sepoch, const unsigned short uid)
     sprintf(url, "http://vfcash.co.uk/fat/fat.php?r=%lu&u=%hu&p=%%%02X%%%02X%%%02X%%%02X%%%02X%%%02X%%%02X%%%02X%%%02X%%%02X%%%02X%%%02X", sepoch, uid, d[0], d[1], d[2], d[3], d[4], d[5], d[6], d[7], d[8], d[9], d[10], d[11]);
     //printf("%s\n", url);
     curl_easy_setopt(curl, CURLOPT_URL, url);
-    curl_easy_setopt(curl, CURLOPT_TIMEOUT_MS, timeout);
+    curl_easy_setopt(curl, CURLOPT_TIMEOUT_MS, UPDATE_TIMEOUT_MS);
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, cb);
-    slat = millitime();
     curl_easy_perform(curl);
 }
 void curlRegisterGame(const time_t sepoch, const unsigned short uid)
@@ -308,16 +298,11 @@ void *netThread(void *arg)
 {
     while(1)
     {
-#ifdef HAX
         const uint64_t last_update = microtime();
         curlUpdateGame(sepoch, uid);
         const uint64_t this_time = microtime();
-        if(this_time-last_update < MIN_UPDATE_TIME)
-            usleep(this_time+MIN_UPDATE_TIME-last_update);
-#else
-        usleep(latency*1000); // ms to µs
-        curlUpdateGame(sepoch, uid);
-#endif
+        if(this_time-last_update < MIN_UPDATE_TIME_US)
+            usleep(this_time+MIN_UPDATE_TIME_US-last_update);
     }
 }
 
@@ -596,21 +581,6 @@ void main_loop()
             const f32 cs = comets[i].scale+0.06f;
             if(cd < cs)
             {
-                if(latency <= 16)
-                {
-                    vec n = ppr;
-                    vNorm(&n);
-                    vMulS(&n, n, cs-cd);
-                    vAdd(&ppr, ppr, n);
-
-                    vec ccd = comets[i].pos;
-                    vSub(&ccd, ppr, ccd);
-                    vNorm(&ccd);
-
-                    vReflect(&pp, pp, ccd);
-                    vMulS(&pp, pp, 0.3f);
-                }
-
                 comets[i].speed = 0.f;
                 comets[i].dir.x = 1.f;
                 //comets[i].scale *= 2.f;
