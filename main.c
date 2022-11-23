@@ -820,7 +820,7 @@ int main(int argc, char** argv)
     printf("----\n");
     printf("James William Fletcher (github.com/mrbid)\n");
     printf("----\n");
-    printf("Argv(2): msaa 0-16, start epoch, high ping 0-333\n");
+    printf("Argv(2): msaa 0-16, start epoch\n");
     printf("F = FPS to console.\n");
     printf("W, A, S, D, SPACE, LEFT SHIFT\n");
     printf("Right Click to Brake\n");
