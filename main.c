@@ -144,7 +144,7 @@ double start_time = 0.0;
 uint high_ping = 0;
 time_t sepoch = 0;
 unsigned short uid = 0;
-time_t last_update = 0;
+uint last_update = 0;
 
 #define MAX_PLAYERS 7
 float players[MAX_PLAYERS*3] = {0};
@@ -172,6 +172,10 @@ uint64_t microtime()
     memset(&tz, 0, sizeof(struct timezone));
     gettimeofday(&tv, &tz);
     return 1000000 * tv.tv_sec + tv.tv_usec;
+}
+inline uint millitime()
+{
+    return microtime()*1000;
 }
 unsigned short urand16()
 {
@@ -261,7 +265,7 @@ void curlUpdateGame(const time_t sepoch, const unsigned short uid);
 static size_t cb(void *data, size_t size, size_t nmemb, void *p)
 {
     if(nmemb > 0 && nmemb <= 84){memcpy(&players, data, nmemb);}
-    last_update = time(0);
+    last_update = millitime();
     curlUpdateGame(sepoch, uid);
     return 0;
 }
@@ -298,8 +302,11 @@ void *netThread(void *arg)
     while(1)
     {
         usleep(wait);
-        if(time(0)-last_update > high_ping)
+        if(millitime()-last_update > high_ping)
+        {
             curlUpdateGame(sepoch, uid);
+            last_update = time(0);
+        }
     }
 }
 
