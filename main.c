@@ -264,7 +264,6 @@ void incrementHits()
     }
 }
 
-void curlUpdateGame(const time_t sepoch, const unsigned short uid);
 static size_t cb(void *data, size_t size, size_t nmemb, void *p)
 {
     latency = millitime()-slat;
