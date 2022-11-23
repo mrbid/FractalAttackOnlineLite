@@ -14,7 +14,7 @@ Removing players bouncing off asteroids would probably completely eliminate any 
 
 Ultimately IPv4 UDP at 144hz is the holy grail. 🙇
 
-### If your ping to the server is under 16ms then you will need to enble high ping mode.
+### If your ping to the server is over 16ms then you will need to enble high ping mode.
 *To enable high ping mode launch as ./fat <msaa> <start epoch> <high ping 0-333>* Either set high ping to you expected max ping with the server, or just set it to 1.
 
 #### Single Player version
