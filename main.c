@@ -267,6 +267,7 @@ void incrementHits()
 static size_t cb(void *data, size_t size, size_t nmemb, void *p)
 {
     latency = millitime()-slat;
+    timeout = latency+(latency/3);
     if(nmemb > 0 && nmemb <= 84){memcpy(&players, data, nmemb);}
     return 0;
 }
@@ -279,7 +280,7 @@ void curlUpdateGame(const time_t sepoch, const unsigned short uid)
     sprintf(url, "http://vfcash.co.uk/fat/fat.php?r=%lu&u=%hu&p=%%%02X%%%02X%%%02X%%%02X%%%02X%%%02X%%%02X%%%02X%%%02X%%%02X%%%02X%%%02X", sepoch, uid, d[0], d[1], d[2], d[3], d[4], d[5], d[6], d[7], d[8], d[9], d[10], d[11]);
     //printf("%s\n", url);
     curl_easy_setopt(curl, CURLOPT_URL, url);
-    curl_easy_setopt(curl, CURLOPT_TIMEOUT_MS, latency+(latency/3));
+    curl_easy_setopt(curl, CURLOPT_TIMEOUT_MS, timeout);
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, cb);
     slat = millitime();
     curl_easy_perform(curl);
@@ -870,14 +871,6 @@ int main(int argc, char** argv)
     curl_easy_setopt(curl, CURLOPT_TCP_KEEPALIVE, 1);
     curl_easy_setopt(curl, CURLOPT_USERAGENT, "fractalattack-agent/1.0");
 
-    // create network thread
-    pthread_t tid;
-    if(pthread_create(&tid, NULL, netThread, NULL) != 0)
-    {
-        printf("pthread_create() failed.");
-        return 0;
-    }
-
     // register game
     curlRegisterGame(sepoch, uid);
 
@@ -1012,6 +1005,14 @@ int main(int argc, char** argv)
 //*************************************
 // execute update / render loop
 //*************************************
+
+    // create network thread
+    pthread_t tid;
+    if(pthread_create(&tid, NULL, netThread, NULL) != 0)
+    {
+        printf("pthread_create() failed.");
+        return 0;
+    }
 
     // wait until epoch
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
