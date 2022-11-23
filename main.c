@@ -43,6 +43,8 @@
 
     All players have to stick to the same FPS to minimise the
     deviance of the simulation over time.
+
+    gcc main.c glad_gl.c -I inc -Ofast -lglfw -lpthread -lcurl -lm -o fat
 */
 
 #include <math.h>
@@ -76,9 +78,7 @@ CURL *curl;
 
 #include "inc/esAux2.h"
 #include "inc/res.h"
-#include "assets/ncube.h"
 #include "assets/exo.h"
-#include "assets/inner.h"
 #include "assets/rock1.h"
 #include "assets/rock2.h"
 #include "assets/rock3.h"
@@ -881,13 +881,13 @@ int main(int argc, char** argv)
 
     // ***** BIND MENGER *****
     scaleBuffer(ncube_vertices, ncube_numvert*3);
-    esBind(GL_ARRAY_BUFFER, &mdlMenger.vid, ncube_vertices, sizeof(ncube_vertices), GL_STATIC_DRAW);
-    esBind(GL_ELEMENT_ARRAY_BUFFER, &mdlMenger.iid, ncube_indices, sizeof(ncube_indices), GL_STATIC_DRAW);
+    esBind(GL_ARRAY_BUFFER, &mdlMenger.vid, ncube_vertices, ncube_vertices_size, GL_STATIC_DRAW);
+    esBind(GL_ELEMENT_ARRAY_BUFFER, &mdlMenger.iid, ncube_indices, ncube_indices_size, GL_STATIC_DRAW);
 
     // ***** BIND INNER *****
     scaleBuffer(exo_vertices, exo_numvert*3);
     esBind(GL_ARRAY_BUFFER, &mdlInner.vid, exo_vertices, exo_vertices_size, GL_STATIC_DRAW);
-    esBind(GL_ARRAY_BUFFER, &mdlInner.cid, inner_colors, sizeof(inner_colors), GL_STATIC_DRAW);
+    esBind(GL_ARRAY_BUFFER, &mdlInner.cid, inner_colors, inner_colors_size, GL_STATIC_DRAW);
 
     // ***** BIND EXO *****
     GLsizeiptr s = exo_numvert*3;
