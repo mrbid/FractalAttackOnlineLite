@@ -301,8 +301,9 @@ void *netThread(void *arg)
         const uint64_t last_update = microtime();
         curlUpdateGame(sepoch, uid);
         const uint64_t this_time = microtime();
-        if(this_time-last_update < MIN_UPDATE_TIME_US)
-            usleep(this_time+MIN_UPDATE_TIME_US-last_update);
+        const uint64_t delta_time = this_time-last_update;
+        if(delta_time < MIN_UPDATE_TIME_US) // was delta time faster than MIN_UPDATE_TIME?
+            usleep(MIN_UPDATE_TIME_US - delta_time); // it was so sleep for the remainder of MIN_UPDATE_TIME
     }
 }
 
