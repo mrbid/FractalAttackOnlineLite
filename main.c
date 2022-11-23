@@ -825,7 +825,7 @@ int main(int argc, char** argv)
     printf("W, A, S, D, SPACE, LEFT SHIFT\n");
     printf("Right Click to Brake\n");
     printf("----\n");
-    printf("epotch: %lu\n", sepoch);
+    printf("epoch: %lu\n", sepoch);
     printf("uid: %hu\n", uid);
     printf("----\n");
 
