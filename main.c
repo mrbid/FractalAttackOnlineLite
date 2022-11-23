@@ -58,6 +58,8 @@
 #include <curl/curl.h>
 CURL *curl;
 
+#pragma GCC diagnostic ignored "-Wunused-result"
+
 #define uint GLuint
 #define sint GLint
 #define f32 GLfloat
@@ -212,8 +214,8 @@ void doExoImpact(vec p, float f)
             exo_colors[i+2] -= 0.2f;
         }
     }
-    esRebind(GL_ARRAY_BUFFER, &mdlExo.vid, exo_vertices, sizeof(exo_vertices), GL_STATIC_DRAW);
-    esRebind(GL_ARRAY_BUFFER, &mdlExo.cid, exo_colors, sizeof(exo_colors), GL_STATIC_DRAW);
+    esRebind(GL_ARRAY_BUFFER, &mdlExo.vid, exo_vertices, exo_vertices_size, GL_STATIC_DRAW);
+    esRebind(GL_ARRAY_BUFFER, &mdlExo.cid, exo_colors, exo_colors_size, GL_STATIC_DRAW);
 }
 void randComet(uint i)
 {
@@ -907,7 +909,7 @@ int main(int argc, char** argv)
 
     // ***** BIND INNER *****
     scaleBuffer(exo_vertices, exo_numvert*3);
-    esBind(GL_ARRAY_BUFFER, &mdlInner.vid, exo_vertices, sizeof(exo_vertices), GL_STATIC_DRAW);
+    esBind(GL_ARRAY_BUFFER, &mdlInner.vid, exo_vertices, exo_vertices_size, GL_STATIC_DRAW);
     esBind(GL_ARRAY_BUFFER, &mdlInner.cid, inner_colors, sizeof(inner_colors), GL_STATIC_DRAW);
 
     // ***** BIND EXO *****
@@ -926,9 +928,9 @@ int main(int argc, char** argv)
         exo_vertices[i+1] *= 1.03f;
         exo_vertices[i+2] *= 1.03f;
     }
-    esBind(GL_ARRAY_BUFFER, &mdlExo.vid, exo_vertices, sizeof(exo_vertices), GL_STATIC_DRAW);
-    esBind(GL_ARRAY_BUFFER, &mdlExo.cid, exo_colors, sizeof(exo_colors), GL_STATIC_DRAW);
-    esBind(GL_ELEMENT_ARRAY_BUFFER, &mdlExo.iid, exo_indices, sizeof(exo_indices), GL_STATIC_DRAW);
+    esBind(GL_ARRAY_BUFFER, &mdlExo.vid, exo_vertices, exo_vertices_size, GL_STATIC_DRAW);
+    esBind(GL_ARRAY_BUFFER, &mdlExo.cid, exo_colors, exo_colors_size, GL_STATIC_DRAW);
+    esBind(GL_ELEMENT_ARRAY_BUFFER, &mdlExo.iid, exo_indices, exo_indices_size, GL_STATIC_DRAW);
 
     // ***** BIND ROCK1 *****
     esBind(GL_ARRAY_BUFFER, &mdlRock[0].vid, rock1_vertices, sizeof(rock1_vertices), GL_STATIC_DRAW);
