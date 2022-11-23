@@ -1,2 +1,2 @@
-make
-upx fat
+make clean
+make release generic=true -j`nproc`
