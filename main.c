@@ -77,17 +77,11 @@ CURL *curl;
 #define SEIR_RAND
 
 #include "inc/esAux2.h"
+
 #include "inc/res.h"
+
 #include "assets/exo.h"
-#include "assets/rock1.h"
-#include "assets/rock2.h"
-#include "assets/rock3.h"
-#include "assets/rock4.h"
-#include "assets/rock5.h"
-#include "assets/rock6.h"
-#include "assets/rock7.h"
-#include "assets/rock8.h"
-#include "assets/rock9.h"
+#include "assets/rocks.h"
 
 //*************************************
 // globals
@@ -803,13 +797,13 @@ void window_size_callback(GLFWwindow* window, int width, int height)
 //*************************************
 int main(int argc, char** argv)
 {
-    // allow custom msaa level
-    int msaa = 16;
-    if(argc >= 2){msaa = atoi(argv[1]);}
-
     // start at epoch
     sepoch = time(0);
-    if(argc >= 3){sepoch = atoll(argv[2]);}
+    if(argc >= 2){sepoch = atoll(argv[1]);}
+
+    // allow custom msaa level
+    int msaa = 16;
+    if(argc >= 3){msaa = atoi(argv[2]);}
 
     // gen client UID
     uid = urand16();
@@ -820,10 +814,11 @@ int main(int argc, char** argv)
     printf("----\n");
     printf("James William Fletcher (github.com/mrbid)\n");
     printf("----\n");
-    printf("Argv(2): msaa 0-16, start epoch\n");
+    printf("Argv(2): start epoch, msaa 0-16\n");
     printf("F = FPS to console.\n");
     printf("W, A, S, D, SPACE, LEFT SHIFT\n");
-    printf("Right Click to Brake\n");
+    printf("L-CTRL / Right Click to Brake\n");
+    printf("Escape / Left Click to free mouse focus.\n");
     printf("----\n");
     printf("epoch: %lu\n", sepoch);
     printf("uid: %hu\n", uid);
