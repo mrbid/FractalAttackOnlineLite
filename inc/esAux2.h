@@ -348,6 +348,23 @@ const GLchar* f1 =
         "gl_FragColor = vec4(ambientColor + lambertian*diffuseColor, vertOpa);\n"
     "}\n";
 
+const GLchar* f11 = // no ambient light
+    "#version 100\n"
+    "precision mediump float;\n"
+    "varying vec3 vertPos;\n"
+    "varying vec3 vertNorm;\n"
+    "varying vec3 vertCol;\n"
+    "varying float vertOpa;\n"
+    "varying vec3 vlightPos;\n"
+    "void main()\n"
+    "{\n"
+        "vec3 diffuseColor = vertCol;\n"
+        "vec3 normal = normalize(vertNorm);\n"
+        "vec3 lightDir = normalize(vlightPos - vertPos);\n"
+        "float lambertian = max(dot(lightDir, normal), 0.0);\n"
+        "gl_FragColor = vec4(lambertian*diffuseColor, vertOpa);\n"
+    "}\n";
+
 const GLchar* v2 = 
     "#version 100\n" 
     "uniform mat4 modelview;\n"
@@ -620,7 +637,7 @@ void makeLambert()
     glCompileShader(vertexShader);
 
     GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragmentShader, 1, &f1, NULL);
+    glShaderSource(fragmentShader, 1, &f11, NULL);
     glCompileShader(fragmentShader);
 
     shdLambert = glCreateProgram();
