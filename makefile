@@ -9,7 +9,7 @@ LDFLAGS = -lglfw -lcurl -lm -lpthread
 .PHONY: all clean release
 all: fat
 
-main.o: main.c inc/gl.h inc/glfw3.h inc/esAux2.h inc/res.h assets/exo.h assets/rock1.h assets/rock2.h assets/rock3.h assets/rock4.h assets/rock5.h assets/rock6.h assets/rock7.h assets/rock8.h assets/rock9.h
+main.o: main.c inc/gl.h inc/glfw3.h inc/esAux2.h inc/res.h assets/exo.h assets/rocks.h
 	$(CC) $(CFLAGS) -c $< -o $@
 
 glad_gl.o: glad_gl.c inc/gl.h
