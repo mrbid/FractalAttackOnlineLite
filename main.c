@@ -820,8 +820,9 @@ int main(int argc, char** argv)
     printf("L-CTRL / Right Click to Brake\n");
     printf("Escape / Left Click to free mouse focus.\n");
     printf("----\n");
-    printf("epoch: %lu\n", sepoch);
-    printf("uid: %hu\n", uid);
+    printf("current epoch: %lu\n", time(0));
+    printf("start epoch:   %lu\n", sepoch);
+    printf("client uid:    %hu\n", uid);
     printf("----\n");
 
     // init glfw
