@@ -9,7 +9,7 @@
     for each triangle from each subdivision.
     
     Get current epoch: date +%s
-    Start online game: ./fat <msaa> <future epoch time>
+    Start online game: ./fat <future epoch time> <msaa>
 
     Every player will start at the same epoch and the
     game simulation should run exactly the same across
