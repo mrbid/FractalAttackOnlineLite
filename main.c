@@ -893,7 +893,7 @@ int main(int argc, char** argv)
         exo_vertices[i]   -= v.x;
         exo_vertices[i+1] -= v.y;
         exo_vertices[i+2] -= v.z;
-        exo_vertices[i] *= 1.03f;
+        exo_vertices[i]   *= 1.03f;
         exo_vertices[i+1] *= 1.03f;
         exo_vertices[i+2] *= 1.03f;
     }
