@@ -169,10 +169,6 @@ uint64_t microtime()
     gettimeofday(&tv, &tz);
     return 1000000 * tv.tv_sec + tv.tv_usec;
 }
-inline uint millitime()
-{
-    return microtime()*1000;
-}
 unsigned short urand16()
 {
     int f = open("/dev/urandom", O_RDONLY | O_CLOEXEC);
