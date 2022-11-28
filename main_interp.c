@@ -7,6 +7,7 @@
     latencies there is only so much you can infer
     from their position change during your update
     latency with the server. It's not very good.
+    I = Toggle Interpolation, default: off
 
     To reduce file size the icosphere could be
     generated on program execution by subdividing
