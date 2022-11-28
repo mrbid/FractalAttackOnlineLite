@@ -18,7 +18,7 @@ glad_gl.o: glad_gl.c inc/gl.h
 assets/exo.o: assets/exo.c assets/exo.h
 	$(CC) $(CFLAGS) -c $< -o $@
 
-fat: main.o glad_gl.o assets/exo.o
+fractalattackonline: main.o glad_gl.o assets/exo.o
 	$(CC) $^ $(LDFLAGS) -o $@
 
 run: fractalattackonline
@@ -27,5 +27,5 @@ run: fractalattackonline
 clean:
 	$(RM) fractalattackonline *.o
 
-release: fat
+release: fractalattackonline
 	upx fractalattackonline
