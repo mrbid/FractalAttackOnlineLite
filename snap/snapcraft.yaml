@@ -33,6 +33,7 @@ apps:
     - opengl
     - wayland
     - x11
+    - network
 
 parts:
   fractalattackonline:
