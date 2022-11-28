@@ -2,6 +2,13 @@
     James William Fletcher (github.com/mrbid)
         November 2022
 
+    !! this was an attempt to add interpolation
+    but unless the server tells you client update
+    latencies there is only so much you can infer
+    from their position change during your update
+    latency with the server. It's not very good.
+    I = Toggle Interpolation, default: off
+
     To reduce file size the icosphere could be
     generated on program execution by subdividing
     a icosahedron and then snapping the points to
@@ -9,7 +16,7 @@
     for each triangle from each subdivision.
     
     Get current epoch: date +%s
-    Start online game: ./fat <future epoch time> <msaa>
+    Start online game: ./fat <msaa> <future epoch time>
 
     Every player will start at the same epoch and the
     game simulation should run exactly the same across
@@ -142,8 +149,13 @@ double start_time = 0.0;
 time_t sepoch = 0;
 unsigned short uid = 0;
 
-#define MAX_PLAYERS 7
+#define MAX_PLAYERS 31
 float players[MAX_PLAYERS*3] = {0};
+float players_vel[MAX_PLAYERS*3] = {0};
+
+uint64_t interp_et = 0;
+float interp_rdt = 0;
+uint interp = 0;
 
 typedef struct
 {
@@ -255,7 +267,8 @@ void incrementHits()
 
 static size_t cb(void *data, size_t size, size_t nmemb, void *p)
 {
-    if(nmemb > 0 && nmemb <= 84){memcpy(&players, data, nmemb);}
+    //if(nmemb > 372){nmemb = 372;}
+    if(nmemb > 0 && nmemb <= 372){memcpy(&players, data, nmemb);}
     return 0;
 }
 void curlUpdateGame(const time_t sepoch, const unsigned short uid)
@@ -286,6 +299,7 @@ void curlRegisterGame(const time_t sepoch, const unsigned short uid)
 }
 void *netThread(void *arg)
 {
+    float prevel[MAX_PLAYERS*3] = {0};
     while(1)
     {
         if(comets[0].speed == -1.f)
@@ -293,11 +307,50 @@ void *netThread(void *arg)
             printf("netThread: quit, end game.\n");
             return 0;
         }
+        
+        if(interp == 1)
+        {
+            for(uint i = 0; i < MAX_PLAYERS; i++)
+            {
+                const uint j = i*3;
+                prevel[j]   = players[j];
+                prevel[j+1] = players[j+1];
+                prevel[j+2] = players[j+2];
+            }
+        }
         const uint64_t last_update = microtime();
         curlUpdateGame(sepoch, uid);
         const uint64_t this_time = microtime();
         const uint64_t delta_time = this_time-last_update;
-        if(delta_time < MIN_UPDATE_TIME_US) // was delta time faster than MIN_UPDATE_TIME?
+        if(interp == 1)
+        {
+            interp_rdt = 1.f/(float)delta_time;
+            interp_et = microtime()+delta_time;
+
+            for(uint i = 0; i < MAX_PLAYERS; i++)
+            {
+                const uint j = i*3;
+                players_vel[j]   = prevel[j] - players[j];
+                players_vel[j+1] = prevel[j+1] - players[j+1];
+                players_vel[j+2] = prevel[j+2] - players[j+2];
+
+                vec v = (vec){players_vel[j], players_vel[j+1], players_vel[j+2]};
+                if(vMod(v) > 0.0001f)
+                {
+                    vInv(&v);
+                    players_vel[j]   = v.x;
+                    players_vel[j+1] = v.y;
+                    players_vel[j+2] = v.z;
+                }
+                else
+                {
+                    players_vel[j]   = 0.f;
+                    players_vel[j+1] = 0.f;
+                    players_vel[j+2] = 0.f;
+                }
+            }
+        }
+        if(interp == 0 && delta_time < MIN_UPDATE_TIME_US) // was delta time faster than MIN_UPDATE_TIME?
             usleep(MIN_UPDATE_TIME_US - delta_time); // it was so sleep for the remainder of MIN_UPDATE_TIME
     }
 }
@@ -684,6 +737,17 @@ void main_loop()
                 }
             }
 
+            if(interp == 1 && ((players_vel[j]+players_vel[j+1]+players_vel[j+2] != 0.f) && microtime() < interp_et))
+            {
+                float s = 1.f - (interp_rdt * (float)(interp_et - microtime()));
+                if(s < 0.f){s = 0.f;}
+                else if(s > 1.f){s = 1.f;}
+                players[j]   += players_vel[j]*s;
+                players[j+1] += players_vel[j+1]*s;
+                players[j+2] += players_vel[j+2]*s;
+                printf("[%u] (%f) %f %f %f\n", i, s, players_vel[j], players_vel[j+1], players_vel[j+2]);
+            }
+            
             mIdent(&model);
             mTranslate(&model, -players[j], -players[j+1], -players[j+2]);
             mScale(&model, 0.01f, 0.01f, 0.01f);
@@ -774,6 +838,14 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
             // players[j+1] = ppr.y;
             // players[j+2] = ppr.z;
         }
+        else if(key == GLFW_KEY_I)
+        {
+            interp = 1 - interp;
+            if(interp == 1)
+                printf("Player interpolation on.\n");
+            else
+                printf("Player interpolation off.\n");
+        }
     }
     else if(action == GLFW_RELEASE)
     {
@@ -814,16 +886,12 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 //*************************************
 int main(int argc, char** argv)
 {
-    // start at epoch
-    sepoch = time(0);
-    if(argc >= 2){sepoch = atoll(argv[1]);}
-
-    // allow custom msaa level
-    int msaa = 16;
-    if(argc >= 3){msaa = atoi(argv[2]);}
-
     // gen client UID
     uid = urand16();
+
+    // epoch
+    sepoch = time(0);
+    sepoch = ((((time_t)(((double)sepoch / 60.0) / 10.0)+1)*10)*60); // next 10th of an hour
 
     // help
     printf("----\n");
@@ -833,14 +901,30 @@ int main(int argc, char** argv)
     printf("----\n");
     printf("Argv(2): start epoch, msaa 0-16\n");
     printf("F = FPS to console.\n");
+    printf("I = Toggle player lag interpolation.\n");
     printf("W, A, S, D, SPACE, LEFT SHIFT\n");
-    printf("L-CTRL / Right Click to Brake\n");
+    printf("L-CTRL / Right Click to Brake.\n");
     printf("Escape / Left Click to free mouse focus.\n");
     printf("----\n");
     printf("current epoch: %lu\n", time(0));
+    
+    if(argc >= 2)
+    {
+        sepoch = atoll(argv[1]);
+        if(sepoch != 0 && sepoch-time(0) < 3)
+        {
+            printf("suggested epoch: %lu\n----\nYour epoch should be at minimum 3 seconds into the future.\n", time(0)+16);
+            return 0;
+        }
+    }
+
     printf("start epoch:   %lu\n", sepoch);
     printf("client uid:    %hu\n", uid);
     printf("----\n");
+
+    // allow custom msaa level
+    int msaa = 16;
+    if(argc >= 3){msaa = atoi(argv[2]);}
 
     // init glfw
     if(!glfwInit()){printf("glfwInit() failed.\n"); exit(EXIT_FAILURE);}
@@ -914,7 +998,7 @@ int main(int argc, char** argv)
         exo_vertices[i]   -= v.x;
         exo_vertices[i+1] -= v.y;
         exo_vertices[i+2] -= v.z;
-        exo_vertices[i] *= 1.03f;
+        exo_vertices[i]   *= 1.03f;
         exo_vertices[i+1] *= 1.03f;
         exo_vertices[i+2] *= 1.03f;
     }
@@ -1014,6 +1098,24 @@ int main(int argc, char** argv)
 // execute update / render loop
 //*************************************
 
+    // render loading screen
+    glfwSetWindowTitle(window, "Please wait...");
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    shadeLambert(&position_id, &projection_id, &modelview_id, &lightpos_id, &color_id, &opacity_id);
+    glUniformMatrix4fv(projection_id, 1, GL_FALSE, (GLfloat*) &projection.m[0][0]);
+    glUniform3f(lightpos_id, 0.f, 0.f, 0.f);
+    glUniform1f(opacity_id, 1.f);
+    glUniform3f(color_id, 1.f, 1.f, 0.f);
+    glBindBuffer(GL_ARRAY_BUFFER, mdlMenger.vid);
+    glVertexAttribPointer(position_id, 3, GL_FLOAT, GL_FALSE, 0, 0);
+    glEnableVertexAttribArray(position_id);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mdlMenger.iid);
+    mIdent(&view);
+    mTranslate(&view, 0.f, 0.f, -0.19f);
+    glUniformMatrix4fv(modelview_id, 1, GL_FALSE, (f32*) &view.m[0][0]);
+    glDrawElements(GL_TRIANGLES, ncube_numind, GL_UNSIGNED_INT, 0);
+    glfwSwapBuffers(window);
+
     // create network thread
     pthread_t tid;
     if(pthread_create(&tid, NULL, netThread, NULL) != 0)
@@ -1023,15 +1125,22 @@ int main(int argc, char** argv)
     }
 
     // wait until epoch
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glfwSwapBuffers(window);
+    // glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    // glfwSwapBuffers(window);
     glfwSetWindowTitle(window, "Please wait...");
     //printf("%lu\n%lu\n-\n", (time_t)((double)microtime()*0.000001), time(0));
     while((time_t)((double)microtime()*0.000001) < sepoch)
     {
         usleep(1000); // this reduces the accuracy by the range in microseconds
         char title[256];
-        sprintf(title, "Please wait... %lu seconds.", sepoch-time(0));
+        uint wp = 0;
+        for(uint i = 0; i < MAX_PLAYERS; i++)
+        {
+            const uint j = i*3;
+            if(players[j] != 0.f || players[j+1] != 0.f || players[j+2] != 0.f)
+                wp++;
+        }
+        sprintf(title, "Please wait... %lu seconds. Total players waiting %u.", sepoch-time(0), wp+1);
         glfwSetWindowTitle(window, title);
     }
     glfwSetWindowTitle(window, "Online Fractal Attack");
