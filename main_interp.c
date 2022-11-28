@@ -1,6 +1,12 @@
 /*
     James William Fletcher (github.com/mrbid)
         November 2022
+        
+    !! this was an attempt to add interpolation
+    but unless the server tells you client update
+    latencies there is only so much you can infer
+    from their position change during your update
+    latency with the server. It's not very good.
 
     To reduce file size the icosphere could be
     generated on program execution by subdividing
