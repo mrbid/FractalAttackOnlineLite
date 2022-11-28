@@ -321,10 +321,11 @@ void *netThread(void *arg)
         curlUpdateGame(sepoch, uid);
         const uint64_t this_time = microtime();
         const uint64_t delta_time = this_time-last_update;
-        interp_rdt = 1.f/(float)delta_time;
-        interp_et = microtime()+delta_time;
         if(interp == 1)
         {
+            interp_rdt = 1.f/(float)delta_time;
+            interp_et = microtime()+delta_time;
+
             for(uint i = 0; i < MAX_PLAYERS; i++)
             {
                 const uint j = i*3;
