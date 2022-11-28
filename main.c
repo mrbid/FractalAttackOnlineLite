@@ -288,6 +288,11 @@ void *netThread(void *arg)
 {
     while(1)
     {
+        if(comets[0].speed == -1.f)
+        {
+            printf("netThread: quit, end game.\n");
+            return 0;
+        }
         const uint64_t last_update = microtime();
         curlUpdateGame(sepoch, uid);
         const uint64_t this_time = microtime();
@@ -575,6 +580,20 @@ void main_loop()
                 comets[i].speed = 0.f;
                 comets[i].dir.x = 1.f;
                 //comets[i].scale *= 2.f;
+            }
+
+            // comet impact
+            for(uint k = 0; k < NUM_COMETS; k++)
+            {
+                if(k == i){continue;}
+                const f32 cd = vDist(comets[i].pos, comets[k].pos);
+                if(cd < comets[i].scale)
+                {
+                    comets[i].speed = 0.f;
+                    comets[i].dir.x = 1.f;
+                    comets[k].speed = 0.f;
+                    comets[k].dir.x = 1.f;
+                }
             }
 
             // flip to grey if red
