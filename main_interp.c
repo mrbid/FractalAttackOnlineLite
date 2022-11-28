@@ -1,12 +1,13 @@
 /*
     James William Fletcher (github.com/mrbid)
         November 2022
-        
+
     !! this was an attempt to add interpolation
     but unless the server tells you client update
     latencies there is only so much you can infer
     from their position change during your update
     latency with the server. It's not very good.
+    I = Toggle Interpolation, default: off
 
     To reduce file size the icosphere could be
     generated on program execution by subdividing
@@ -147,13 +148,14 @@ uint damage = 0;
 double start_time = 0.0;
 time_t sepoch = 0;
 unsigned short uid = 0;
-uint interp = 0;
 
 #define MAX_PLAYERS 7
 float players[MAX_PLAYERS*3] = {0};
 float players_vel[MAX_PLAYERS*3] = {0};
-uint64_t players_et[MAX_PLAYERS] = {0};
-float players_rdt[MAX_PLAYERS] = {0};
+
+uint64_t interp_et = 0;
+float interp_rdt = 0;
+uint interp = 0;
 
 typedef struct
 {
@@ -313,6 +315,8 @@ void *netThread(void *arg)
         curlUpdateGame(sepoch, uid);
         const uint64_t this_time = microtime();
         const uint64_t delta_time = this_time-last_update;
+        interp_rdt = 1.f/(float)delta_time;
+        interp_et = microtime()+delta_time;
         if(interp == 1)
         {
             for(uint i = 0; i < MAX_PLAYERS; i++)
@@ -323,25 +327,18 @@ void *netThread(void *arg)
                 players_vel[j+2] = prevel[j+2] - players[j+2];
 
                 vec v = (vec){players_vel[j], players_vel[j+1], players_vel[j+2]};
-                if(vMod(v) > 0.001f)
+                if(vMod(v) > 0.0001f)
                 {
                     vInv(&v);
                     players_vel[j]   = v.x;
                     players_vel[j+1] = v.y;
                     players_vel[j+2] = v.z;
-                    players_rdt[i] = 1.f/(float)delta_time;
-                    players_et[i] = microtime()+delta_time;
-
-                    //printf("%f %f %lu %lu %lu\n", players_rdt[i], players_et[i], delta_time, microtime());
-                    //printf("%u: %f %f %f\n", i, players_vel[j], players_vel[j+1], players_vel[j+2]);
                 }
                 else
                 {
                     players_vel[j]   = 0.f;
                     players_vel[j+1] = 0.f;
                     players_vel[j+2] = 0.f;
-                    players_rdt[i] = 0;
-                    players_et[i] = 0;
                 }
             }
         }
@@ -718,9 +715,9 @@ void main_loop()
                 }
             }
 
-            if(interp == 1 && ((players_vel[j]+players_vel[j+1]+players_vel[j+2] != 0.f) && microtime() < players_et[i]))
+            if(interp == 1 && ((players_vel[j]+players_vel[j+1]+players_vel[j+2] != 0.f) && microtime() < interp_et))
             {
-                float s = 1.f - (players_rdt[i] * (float)(players_et[i] - microtime()));
+                float s = 1.f - (interp_rdt * (float)(interp_et - microtime()));
                 if(s < 0.f){s = 0.f;}
                 else if(s > 1.f){s = 1.f;}
                 players[j]   += players_vel[j]*s;
