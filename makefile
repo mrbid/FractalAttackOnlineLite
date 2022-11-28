@@ -7,7 +7,7 @@ endif
 LDFLAGS = -lglfw -lcurl -lm -lpthread
 
 .PHONY: all clean release
-all: fat
+all: fractalattackonline
 
 main.o: main.c inc/gl.h inc/glfw3.h inc/esAux2.h inc/res.h assets/exo.h assets/rocks.h
 	$(CC) $(CFLAGS) -c $< -o $@
@@ -21,11 +21,11 @@ assets/exo.o: assets/exo.c assets/exo.h
 fat: main.o glad_gl.o assets/exo.o
 	$(CC) $^ $(LDFLAGS) -o $@
 
-run: fat
-	./fat
+run: fractalattackonline
+	./fractalattackonline
 
 clean:
-	$(RM) fat *.o
+	$(RM) fractalattackonline *.o
 
 release: fat
-	upx fat
+	upx fractalattackonline
