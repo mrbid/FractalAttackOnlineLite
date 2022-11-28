@@ -185,7 +185,7 @@ void scaleBuffer(GLfloat* b, GLsizeiptr s)
 void doExoImpact(vec p, float f)
 {
     //if(f < 0.003793040058F){return;}
-    GLsizeiptr s = exo_numvert*3;
+    const GLsizeiptr s = exo_numvert*3;
     for(GLsizeiptr i = 0; i < s; i+=3)
     {
         vec v = {exo_vertices[i], exo_vertices[i+1], exo_vertices[i+2]};
@@ -681,6 +681,29 @@ void main_loop()
 //*************************************
 // Input Handelling
 //*************************************
+void window_size_callback(GLFWwindow* window, int width, int height)
+{
+    winw = width;
+    winh = height;
+
+    glViewport(0, 0, winw, winh);
+    aspect = (f32)winw / (f32)winh;
+    ww = (double)winw;
+    wh = (double)winh;
+    rww = 1.0/ww;
+    rwh = 1.0/wh;
+    ww2 = ww/2.0;
+    wh2 = wh/2.0;
+    uw = (double)aspect/ww;
+    uh = 1.0/wh;
+    uw2 = (double)aspect/ww2;
+    uh2 = 1.0/wh2;
+
+    mIdent(&projection);
+    mPerspective(&projection, 60.0f, aspect, 0.01f, FAR_DISTANCE);
+    glUniformMatrix4fv(projection_id, 1, GL_FALSE, (GLfloat*) &projection.m[0][0]);
+}
+
 static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
     if(action == GLFW_PRESS)
@@ -712,6 +735,7 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
                 glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
             glfwSetCursorPos(window, ww2, wh2);
             glfwGetCursorPos(window, &ww2, &wh2);
+            window_size_callback(window, winw, winh);
         }
         else if(key == GLFW_KEY_V)
         {
@@ -757,35 +781,13 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
                 glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
             glfwSetCursorPos(window, ww2, wh2);
             glfwGetCursorPos(window, &ww2, &wh2);
+            window_size_callback(window, winw, winh);
         }
         else if(button == GLFW_MOUSE_BUTTON_RIGHT)
             brake = 1;
     }
     else if(action == GLFW_RELEASE)
         brake = 0;
-}
-
-void window_size_callback(GLFWwindow* window, int width, int height)
-{
-    winw = width;
-    winh = height;
-
-    glViewport(0, 0, winw, winh);
-    aspect = (f32)winw / (f32)winh;
-    ww = (double)winw;
-    wh = (double)winh;
-    rww = 1.0/ww;
-    rwh = 1.0/wh;
-    ww2 = ww/2.0;
-    wh2 = wh/2.0;
-    uw = (double)aspect/ww;
-    uh = 1.0/wh;
-    uw2 = (double)aspect/ww2;
-    uh2 = 1.0/wh2;
-
-    mIdent(&projection);
-    mPerspective(&projection, 60.0f, aspect, 0.01f, FAR_DISTANCE);
-    glUniformMatrix4fv(projection_id, 1, GL_FALSE, (GLfloat*) &projection.m[0][0]);
 }
 
 //*************************************
@@ -893,7 +895,7 @@ int main(int argc, char** argv)
         exo_vertices[i]   -= v.x;
         exo_vertices[i+1] -= v.y;
         exo_vertices[i+2] -= v.z;
-        exo_vertices[i]   *= 1.03f;
+        exo_vertices[i] *= 1.03f;
         exo_vertices[i+1] *= 1.03f;
         exo_vertices[i+2] *= 1.03f;
     }
@@ -1014,6 +1016,7 @@ int main(int argc, char** argv)
         glfwSetWindowTitle(window, title);
     }
     glfwSetWindowTitle(window, "Online Fractal Attack");
+    window_size_callback(window, winw, winh);
 
     // set start time
     start_time = glfwGetTime();
