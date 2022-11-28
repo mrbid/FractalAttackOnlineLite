@@ -46,4 +46,7 @@ parts:
     stage-packages:
     - libglfw3
     - libgles2
-    - libcurl4-openssl-dev
+    - try:
+      - libcurl4
+    - else:
+      - libcurl3
