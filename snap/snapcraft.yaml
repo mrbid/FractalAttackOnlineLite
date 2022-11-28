@@ -1,0 +1,46 @@
+name: fractalattackonline
+base: core20
+version: '1.0'
+summary: A multi-player destructible planet simulation!
+description: |
+  In this simulation you can hit the planet head-on creating dents/craters in it, or just watch the Menger Sponge comets hit into it creating craters.
+  
+  Use W,A,S,D,SPACE & LEFT SHIFT to move around.
+  L-CTRL / Right Click to Brake.
+  Escape / Left Click to free mouse focus.
+  I = Toggle player lag interpolation.
+  F = FPS to console.
+
+grade: stable
+confinement: strict
+
+architectures:
+  - build-on: amd64
+    run-on: amd64
+  - build-on: arm64
+    run-on: arm64
+  - build-on: armhf
+    run-on: armhf
+
+apps:
+  fractalattackonline:
+    extensions: [gnome-3-38]
+    command: fractalattack
+    plugs:
+    - desktop
+    - desktop-legacy
+    - gsettings
+    - opengl
+    - wayland
+    - x11
+
+parts:
+  fractalattackonline:
+    source: https://github.com/mrbid/fractalattackonline
+    source-type: git
+    plugin: make
+    build-packages:
+    - libglfw3-dev
+    stage-packages:
+    - libglfw3
+    - libgles2
