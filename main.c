@@ -201,9 +201,10 @@ void doExoImpact(vec p, float f)
     for(GLsizeiptr i = 0; i < s; i+=3)
     {
         vec v = {exo_vertices[i], exo_vertices[i+1], exo_vertices[i+2]};
-        const f32 ds = vDist(v, p);
-        if(ds < f)
+        f32 ds = vDistSq(v, p);
+        if(ds < f*f)
         {
+            ds = vDist(v, p);
             vNorm(&v);
             const f32 sr = f-ds;
             vMulS(&v, v, sr);
