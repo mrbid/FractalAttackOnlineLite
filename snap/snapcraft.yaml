@@ -25,7 +25,7 @@ architectures:
 apps:
   fractalattackonline:
     extensions: [gnome-3-38]
-    command: fractalattack
+    command: fractalattackonline
     plugs:
     - desktop
     - desktop-legacy
