@@ -29,3 +29,9 @@ clean:
 
 release: fractalattackonline
 	upx fractalattackonline
+
+install:
+	cp fractalattackonline $(DESTDIR)
+
+uninstall:
+	rm $(DESTDIR)/fractalattackonline
