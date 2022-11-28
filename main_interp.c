@@ -7,7 +7,6 @@
     latencies there is only so much you can infer
     from their position change during your update
     latency with the server. It's not very good.
-    I = Toggle Interpolation, default: off
 
     To reduce file size the icosphere could be
     generated on program execution by subdividing
@@ -301,6 +300,12 @@ void *netThread(void *arg)
     float prevel[MAX_PLAYERS*3] = {0};
     while(1)
     {
+        if(comets[0].speed == -1.f)
+        {
+            printf("netThread: quit, end game.\n");
+            return 0;
+        }
+        
         if(interp == 1)
         {
             for(uint i = 0; i < MAX_PLAYERS; i++)
@@ -625,6 +630,20 @@ void main_loop()
                 comets[i].speed = 0.f;
                 comets[i].dir.x = 1.f;
                 //comets[i].scale *= 2.f;
+            }
+
+            // comet impact
+            for(uint k = 0; k < NUM_COMETS; k++)
+            {
+                if(k == i){continue;}
+                const f32 cd = vDist(comets[i].pos, comets[k].pos);
+                if(cd < comets[i].scale)
+                {
+                    comets[i].speed = 0.f;
+                    comets[i].dir.x = 1.f;
+                    comets[k].speed = 0.f;
+                    comets[k].dir.x = 1.f;
+                }
             }
 
             // flip to grey if red
