@@ -42,7 +42,8 @@ parts:
     plugin: make
     build-packages:
     - libglfw3-dev
-    - libcurl4-openssl-dev
+    - libcurl3-gnutls
     stage-packages:
     - libglfw3
     - libgles2
+    - libcurl3-gnutls
