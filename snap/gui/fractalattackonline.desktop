@@ -1,0 +1,10 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=Fractal Attack Online
+Comment=A multi-player destructible planet simulation!
+StartupNotify=false
+Exec=fractalattackonline
+Icon=${SNAP}/meta/gui/fractalattackonline.png
+Terminal=false
+Type=Application
+Categories=Application;Game;Simulation;
