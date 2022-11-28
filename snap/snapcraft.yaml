@@ -3,7 +3,7 @@ base: core20
 version: '1.0'
 summary: A multi-player destructible planet simulation!
 description: |
-  In this simulation you can hit the planet head-on creating dents/craters in it, or just watch the Menger Sponge comets hit into it creating craters.
+  Play with friends online to defend the planet! Longest time to first impact or longest time to 100% damage.
   
   Use W,A,S,D,SPACE & LEFT SHIFT to move around.
   L-CTRL / Right Click to Brake.
