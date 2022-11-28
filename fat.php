@@ -45,7 +45,7 @@
         if(is_dir($_GET['r']) == true)
         {
             $ar = glob($_GET['r'] . '/*');
-            if(count($ar) >= 8)
+            if(count($ar) >= 32)
             {
                 //echo "registration rejected: max players reached";
                 header("HTTP/1.1 200 OK");
