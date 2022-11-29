@@ -136,7 +136,7 @@ f32 xrot = 0.f, yrot = 0.f;
 
 // game vars
 #define GFX_SCALE 0.01f
-#define MOVE_SPEED 0.003f
+#define MOVE_SPEED 0.5f
 #define MIN_UPDATE_TIME_US 10000
 #define UPDATE_TIMEOUT_MS 1000
 uint keystate[6] = {0};
@@ -268,7 +268,7 @@ void incrementHits()
 static size_t cb(void *data, size_t size, size_t nmemb, void *p)
 {
     //if(nmemb > 372){nmemb = 372;}
-    if(nmemb > 0 && nmemb <= 372){memcpy(&players, data, nmemb);}
+    if(nmemb > 11 && nmemb <= 372){memcpy(&players, data, nmemb);}
     return 0;
 }
 void curlUpdateGame(const time_t sepoch, const unsigned short uid)
@@ -454,7 +454,9 @@ void main_loop()
     if(brake == 1)
         vMulS(&pp, pp, 0.99f*(1.f-dt));
 
-    vAdd(&ppr, ppr, pp);
+    vec ppi = pp;
+    vMulS(&ppi, ppi, dt);
+    vAdd(&ppr, ppr, ppi);
 
     const f32 pmod = vMod(ppr);
     if(pmod < 1.14f)
@@ -745,7 +747,7 @@ void main_loop()
                 players[j]   += players_vel[j]*s;
                 players[j+1] += players_vel[j+1]*s;
                 players[j+2] += players_vel[j+2]*s;
-                printf("[%u] (%f) %f %f %f\n", i, s, players_vel[j], players_vel[j+1], players_vel[j+2]);
+                //printf("[%u] (%f) %f %f %f\n", i, s, players_vel[j], players_vel[j+1], players_vel[j+2]);
             }
             
             mIdent(&model);
