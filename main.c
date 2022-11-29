@@ -145,7 +145,6 @@ vec ppr = {0.f, 0.f, -2.3f};
 uint hits = 0;
 uint brake = 0;
 uint damage = 0;
-double start_time = 0.0;
 time_t sepoch = 0;
 unsigned short uid = 0;
 
@@ -250,7 +249,7 @@ void incrementHits()
     hits++;
     char title[256];
     const uint max_damage = exo_numvert/2;
-    sprintf(title, "Online Fractal Attack | %u | %.2f%% | %.2f mins", hits, (100.f/(float)max_damage)*(float)damage, (glfwGetTime()-start_time)/60.0);
+    sprintf(title, "Online Fractal Attack | %u | %.2f%% | %.2f mins", hits, (100.f/(float)max_damage)*(float)damage, (time(0)-sepoch)/60.0);
     glfwSetWindowTitle(window, title);
 
     if(damage >= max_damage)
@@ -261,7 +260,7 @@ void incrementHits()
             comets[i].rot = 0.f;
         }
 
-        sprintf(title, "Online Fractal Attack | %u | 100%% | %.2f mins | GAME END", hits, (glfwGetTime()-start_time)/60.0);
+        sprintf(title, "Online Fractal Attack | %u | 100%% | %.2f mins | GAME END", hits, (time(0)-sepoch)/60.0);
         glfwSetWindowTitle(window, title);
     }
 }
@@ -1146,9 +1145,6 @@ int main(int argc, char** argv)
     }
     glfwSetWindowTitle(window, "Online Fractal Attack");
     window_size_callback(window, winw, winh);
-
-    // set start time
-    start_time = glfwGetTime();
 
     // seed random
     srandf(sepoch);
