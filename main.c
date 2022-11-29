@@ -2,12 +2,12 @@
     James William Fletcher (github.com/mrbid)
         November 2022
 
-    !! this was an attempt to add interpolation
+    !! this was an attempt to add extrapolation
     but unless the server tells you client update
     latencies there is only so much you can infer
     from their position change during your update
     latency with the server. It's not very good.
-    I = Toggle Interpolation, default: off
+    I = Toggle Extrapolation, default: off
 
     To reduce file size the icosphere could be
     generated on program execution by subdividing
@@ -844,9 +844,9 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
         {
             interp = 1 - interp;
             if(interp == 1)
-                printf("Player interpolation on.\n");
+                printf("Player extrapolation on.\n");
             else
-                printf("Player interpolation off.\n");
+                printf("Player extrapolation off.\n");
         }
     }
     else if(action == GLFW_RELEASE)
@@ -903,7 +903,7 @@ int main(int argc, char** argv)
     printf("----\n");
     printf("Argv(2): start epoch, msaa 0-16\n");
     printf("F = FPS to console.\n");
-    printf("I = Toggle player lag interpolation.\n");
+    printf("I = Toggle player lag extrapolation.\n");
     printf("W, A, S, D, SPACE, LEFT SHIFT\n");
     printf("L-CTRL / Right Click to Brake.\n");
     printf("Escape / Left Click to free mouse focus.\n");
