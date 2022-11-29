@@ -892,7 +892,7 @@ int main(int argc, char** argv)
 
     // epoch
     sepoch = time(0);
-    sepoch = ((((time_t)(((double)sepoch / 60.0) / 10.0)+1)*10)*60); // next 10th of an hour
+    sepoch = ((((time_t)(((double)sepoch / 60.0) / 3.0)+1)*3)*60); // next 20th of an hour
 
     // help
     printf("----\n");
