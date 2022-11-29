@@ -627,9 +627,9 @@ void main_loop()
             }
 
             // player impact
-            const f32 cd = vDist((vec){-ppr.x, -ppr.y, -ppr.z}, comets[i].pos);
+            const f32 cd = vDistSq((vec){-ppr.x, -ppr.y, -ppr.z}, comets[i].pos);
             const f32 cs = comets[i].scale+0.06f;
-            if(cd < cs)
+            if(cd < cs*cs)
             {
                 comets[i].speed = 0.f;
                 comets[i].dir.x = 1.f;
@@ -640,8 +640,8 @@ void main_loop()
             for(uint k = 0; k < NUM_COMETS; k++)
             {
                 if(k == i){continue;}
-                const f32 cd = vDist(comets[i].pos, comets[k].pos);
-                if(cd < comets[i].scale)
+                const f32 cd = vDistSq(comets[i].pos, comets[k].pos);
+                if(cd < comets[i].scale*comets[i].scale)
                 {
                     comets[i].speed = 0.f;
                     comets[i].dir.x = 1.f;
@@ -729,9 +729,9 @@ void main_loop()
         {
             for(uint k = 0; k < NUM_COMETS; k++)
             {
-                const f32 cd = vDist((vec){-players[j], -players[j+1], -players[j+2]}, comets[k].pos);
+                const f32 cd = vDistSq((vec){-players[j], -players[j+1], -players[j+2]}, comets[k].pos);
                 const f32 cs = comets[i].scale+0.06f;
-                if(cd < cs)
+                if(cd < cs*cs)
                 {
                     comets[k].speed = 0.f;
                     comets[k].dir.x = 1.f;
