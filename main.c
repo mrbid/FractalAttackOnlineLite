@@ -818,9 +818,9 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
                 glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
             else
                 glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+            window_size_callback(window, winw, winh);
             glfwSetCursorPos(window, ww2, wh2);
             glfwGetCursorPos(window, &ww2, &wh2);
-            window_size_callback(window, winw, winh);
         }
         else if(key == GLFW_KEY_V)
         {
@@ -872,9 +872,9 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
                 glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
             else
                 glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+            window_size_callback(window, winw, winh);
             glfwSetCursorPos(window, ww2, wh2);
             glfwGetCursorPos(window, &ww2, &wh2);
-            window_size_callback(window, winw, winh);
         }
         else if(button == GLFW_MOUSE_BUTTON_RIGHT)
             brake = 1;
