@@ -5,7 +5,7 @@ summary: A multi-player destructible planet simulation!
 description: |
   Play with friends online to defend the planet! Longest time to first impact or longest time to 100% damage.
   
-  Use W,A,S,D,SPACE & LEFT SHIFT to move around.
+  Use W,A,S,D,Q,E,SPACE & LEFT SHIFT to move around.
   L-CTRL / Right Click to Brake.
   Escape / Left Click to free mouse focus.
   I = Toggle player lag interpolation.
@@ -37,7 +37,7 @@ apps:
 
 parts:
   fractalattackonline:
-    source: https://github.com/mrbid/fractalattackonline
+    source: https://github.com/mrbid/fractalattackonlinelite
     source-type: git
     plugin: make
     build-packages:
