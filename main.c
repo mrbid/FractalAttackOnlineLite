@@ -499,7 +499,7 @@ void main_loop()
 //*************************************
 
     // mouse delta to rot
-    f32 xrot = 0, yrot = 0;
+    f32 xrot = 0.f, yrot = 0.f;
     if(focus_cursor == 1)
     {
         glfwGetCursorPos(window, &x, &y);
@@ -519,7 +519,7 @@ void main_loop()
     vCross(&tmp1, vecview[1], vecview[0]);
     vMulS(&tmp1, tmp1, sinf(xrot));
 
-    vMulS(&vecview[0], vecview[1], vDot(vecview[1], vecview[0]) * (1 - cosf(xrot)));
+    vMulS(&vecview[0], vecview[1], vDot(vecview[1], vecview[0]) * (1.f - cosf(xrot)));
 
     vAdd(&vecview[0], vecview[0], tmp0);
     vAdd(&vecview[0], vecview[0], tmp1);
@@ -530,7 +530,7 @@ void main_loop()
     vCross(&tmp1, vecview[0], vecview[1]);
     vMulS(&tmp1, tmp1, sinf(yrot));
 
-    vMulS(&vecview[1], vecview[0], vDot(vecview[0], vecview[1]) * (1 - cosf(yrot)));
+    vMulS(&vecview[1], vecview[0], vDot(vecview[0], vecview[1]) * (1.f - cosf(yrot)));
 
     vAdd(&vecview[1], vecview[1], tmp0);
     vAdd(&vecview[1], vecview[1], tmp1);
@@ -539,12 +539,12 @@ void main_loop()
     vCross(&vecview[1], vecview[2], vecview[0]);
 
     // roll
-    vMulS(&tmp0, vecview[0], cos(zrot));
+    vMulS(&tmp0, vecview[0], cosf(zrot));
 
     vCross(&tmp1, vecview[2], vecview[0]);
-    vMulS(&tmp1, tmp1, sin(zrot));
+    vMulS(&tmp1, tmp1, sinf(zrot));
 
-    vMulS(&vecview[0], vecview[2], vDot(vecview[2], vecview[0]) * (1 - cos(zrot)));
+    vMulS(&vecview[0], vecview[2], vDot(vecview[2], vecview[0]) * (1.f - cosf(zrot)));
 
     vAdd(&vecview[0], vecview[0], tmp0);
     vAdd(&vecview[0], vecview[0], tmp1);
@@ -559,7 +559,7 @@ void main_loop()
         vecview[0].x, vecview[1].x, vecview[2].x, view.m[0][3],
         vecview[0].y, vecview[1].y, vecview[2].y, view.m[1][3],
         vecview[0].z, vecview[1].z, vecview[2].z, view.m[2][3],
-        0, 0, 0, view.m[3][3]
+        0.f, 0.f, 0.f, view.m[3][3]
     };
 
     // translate
