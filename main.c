@@ -139,10 +139,11 @@ f32 xrot = 0.f, yrot = 0.f;
 #define MOVE_SPEED 0.5f
 #define MIN_UPDATE_TIME_US 10000
 #define UPDATE_TIMEOUT_MS 1000
-uint keystate[6] = {0};
+uint keystate[8] = {0};
 vec pp = {0.f, 0.f, 0.f};
 vec ppr = {0.f, 0.f, -2.3f};
 uint hits = 0;
+uint popped = 0;
 uint brake = 0;
 uint damage = 0;
 time_t sepoch = 0;
@@ -249,7 +250,7 @@ void incrementHits()
     hits++;
     char title[256];
     const uint max_damage = exo_numvert/2;
-    sprintf(title, "Online Fractal Attack | %u | %.2f%% | %.2f mins", hits, (100.f/(float)max_damage)*(float)damage, (time(0)-sepoch)/60.0);
+    sprintf(title, "Online Fractal Attack | %u/%u | %.2f%% | %.2f mins", hits, popped, (100.f/(float)max_damage)*(float)damage, (time(0)-sepoch)/60.0);
     glfwSetWindowTitle(window, title);
 
     if(damage >= max_damage)
@@ -260,7 +261,7 @@ void incrementHits()
             comets[i].rot = 0.f;
         }
 
-        sprintf(title, "Online Fractal Attack | %u | 100%% | %.2f mins | GAME END", hits, (time(0)-sepoch)/60.0);
+        sprintf(title, "Online Fractal Attack | %u/%u | 100%% | %.2f mins | GAME END", hits, popped, (time(0)-sepoch)/60.0);
         glfwSetWindowTitle(window, title);
     }
 }
@@ -372,83 +373,57 @@ void main_loop()
 // keystates
 //*************************************
 
-    static vec vd;
-    mGetViewDir(&vd, view);
+    vec vecview[3] = {
+        {view.m[0][0], view.m[1][0], view.m[2][0]}, // r
+        {view.m[0][1], view.m[1][1], view.m[2][1]}, // u
+        {view.m[0][2], view.m[1][2], view.m[2][2]}  // f
+    };
 
-    static uint inverted = 0;
-    if(view.m[1][1] < 0.f) // could probably do some bit magic here to transfer the signed part of the view float to a 1 float to avoid the branching and turn it into a multiply op to invert the signs
-        inverted = 1;
-    else
-        inverted = 0;
-
-    static uint locked = 0;
-    if(view.m[1][1] > -0.03f && view.m[1][1] < 0.03f)
-        locked = 1;
-    else
-        locked = 0;
+    static f32 zrot = 0.f;
 
     if(keystate[2] == 1) // W
     {
+        vec vdc = (vec){view.m[0][2], view.m[1][2], view.m[2][2]};
         vec m;
-        vMulS(&m, vd, MOVE_SPEED * dt);
-        vSub(&pp, pp, m);
-    }
-
-    if(keystate[3] == 1) // S
-    {
-        vec m;
-        vMulS(&m, vd, MOVE_SPEED * dt);
+        vMulS(&m, vdc, MOVE_SPEED * dt);
         vAdd(&pp, pp, m);
+    }
+    else if(keystate[3] == 1) // S
+    {
+        vec vdc = (vec){view.m[0][2], view.m[0][2], view.m[2][2]};
+        vec m;
+        vMulS(&m, vdc, MOVE_SPEED * dt);
+        vSub(&pp, pp, m);
     }
 
     if(keystate[0] == 1) // A
     {
-        vec vdc;
-        vCross(&vdc, vd, (vec){0.f, 1.f, 0.f});
+        vec vdc = (vec){view.m[0][0], view.m[1][0], view.m[2][0]};
         vec m;
         vMulS(&m, vdc, MOVE_SPEED * dt);
-        if(inverted == 0)
-            vAdd(&pp, pp, m);
-        else
-            vSub(&pp, pp, m);
+        vAdd(&pp, pp, m);
     }
-
-    if(keystate[1] == 1) // D
+    else if(keystate[1] == 1) // D
     {
-        vec vdc;
-        vCross(&vdc, vd, (vec){0.f, 1.f, 0.f});
+        vec vdc = (vec){view.m[0][0], view.m[1][0], view.m[2][0]};
         vec m;
         vMulS(&m, vdc, MOVE_SPEED * dt);
-        if(inverted == 0)
-            vSub(&pp, pp, m);
-        else
-            vAdd(&pp, pp, m);
+        vSub(&pp, pp, m);
     }
 
     if(keystate[4] == 1) // SPACE
     {
-        vec vdc;
-        vCross(&vdc, vd, (vec){0.f, 1.f, 0.f});
-        vCross(&vdc, vd, vdc);
+        vec vdc = (vec){view.m[0][1], view.m[1][1], view.m[2][1]};
         vec m;
         vMulS(&m, vdc, MOVE_SPEED * dt);
-        if(inverted == 0)
-            vAdd(&pp, pp, m);
-        else
-            vSub(&pp, pp, m);
+        vSub(&pp, pp, m);
     }
-
-    if(keystate[5] == 1) // SHIFT
+    else if(keystate[5] == 1) // SHIFT
     {
-        vec vdc;
-        vCross(&vdc, vd, (vec){0.f, 1.f, 0.f});
-        vCross(&vdc, vd, vdc);
+        vec vdc = (vec){view.m[0][1], view.m[1][1], view.m[2][1]};
         vec m;
         vMulS(&m, vdc, MOVE_SPEED * dt);
-        if(inverted == 0)
-            vSub(&pp, pp, m);
-        else
-            vAdd(&pp, pp, m);
+        vAdd(&pp, pp, m);
     }
 
     if(brake == 1)
@@ -459,7 +434,56 @@ void main_loop()
     vAdd(&ppr, ppr, ppi);
 
     const f32 pmod = vMod(ppr);
-    if(pmod < 1.14f)
+    if(pmod < 2.f) // self-righting
+    {
+        vec dve = (vec){view.m[0][0], view.m[1][0], view.m[2][0]};
+        vec dvp = ppr;
+        vInv(&dvp);
+        vNorm(&dvp);
+        const f32 ta = vDot(dve, dvp);
+        if(ta < -0.03f || ta > 0.03f)
+        {
+            // const f32 ia = ta*0.01f;
+            const f32 ia = (ta*0.03f) * ( 1.f - ((pmod - 1.14f) * 1.162790656f) ); // 0.86f
+            zrot -= ia*dt;
+            //printf("%f %f %f\n", zrot, ta, pmod);
+        }
+        else
+            zrot = 0.f;
+    }
+    else // roll inputs
+    {
+        if(brake == 1)
+            zrot *= 0.99f*(1.f-dt);
+
+        if(keystate[6] && !keystate[7]) {
+            if(zrot > 0.f) {
+                zrot += dt*sens*10.f;
+            } else {
+                zrot *= 1.f-(dt*0.02f);
+                zrot += dt*sens*10.f;
+            }
+        } else if(keystate[7] && !keystate[6]) {
+            if(zrot < 0.f) {
+                zrot -= dt*sens*10.f;
+            } else {
+                zrot *= 1.f-(dt*0.02f);
+                zrot -= dt*sens*10.f;
+            }
+        } else if(keystate[6] && keystate[7]) {
+            zrot = 0.f;
+        } else {
+            if (zrot > 0.09f || zrot < -0.09f)
+                zrot *= 1.f-(dt*0.91f);
+            else if (zrot > 0.001f)
+                zrot -= 0.001f*dt;
+            else if (zrot < -0.001f)
+                zrot += 0.001f*dt;
+            else
+                zrot = 0.f;
+        }
+    }
+    if(pmod < 1.14f) // exo collision
     {
         const f32 hf = vMod(pp)*10.f;
         vec n = ppr;
@@ -474,32 +498,71 @@ void main_loop()
 // camera
 //*************************************
 
+    // mouse delta to rot
+    f32 xrot = 0, yrot = 0;
     if(focus_cursor == 1)
     {
         glfwGetCursorPos(window, &x, &y);
-        
-        if(locked == 0)
-        {
-            if(inverted == 0)
-                xrot += (ww2-x)*sens;
-            else
-                xrot -= (ww2-x)*sens;
-        }
-        yrot += (wh2-y)*sens;
-
-        // if(yrot > d2PI)
-        //     yrot = d2PI;
-        // if(yrot < -d2PI)
-        //     yrot = -d2PI;
-
+        xrot = (ww2-x)*sens;
+        yrot = (wh2-y)*sens;
         glfwSetCursorPos(window, ww2, wh2);
     }
 
-    mIdent(&view);
-    mRotate(&view, yrot, 1.f, 0.f, 0.f);
-    mRotate(&view, xrot, 0.f, 1.f, 0.f);
-    // mRotY(&view, yrot);
-    // mRotX(&view, xrot);
+    // Test_User angle-axis rotation
+    // https://en.wikipedia.org/wiki/Axis%E2%80%93angle_representation
+    // https://en.wikipedia.org/wiki/Rodrigues%27_rotation_formula
+    vec tmp0, tmp1;
+
+    // left/right
+    vMulS(&tmp0, vecview[0], cosf(xrot));
+
+    vCross(&tmp1, vecview[1], vecview[0]);
+    vMulS(&tmp1, tmp1, sinf(xrot));
+
+    vMulS(&vecview[0], vecview[1], vDot(vecview[1], vecview[0]) * (1 - cosf(xrot)));
+
+    vAdd(&vecview[0], vecview[0], tmp0);
+    vAdd(&vecview[0], vecview[0], tmp1);
+
+    // up/down
+    vMulS(&tmp0, vecview[1], cosf(yrot));
+
+    vCross(&tmp1, vecview[0], vecview[1]);
+    vMulS(&tmp1, tmp1, sinf(yrot));
+
+    vMulS(&vecview[1], vecview[0], vDot(vecview[0], vecview[1]) * (1 - cosf(yrot)));
+
+    vAdd(&vecview[1], vecview[1], tmp0);
+    vAdd(&vecview[1], vecview[1], tmp1);
+
+    vCross(&vecview[2], vecview[0], vecview[1]);
+    vCross(&vecview[1], vecview[2], vecview[0]);
+
+    // roll
+    vMulS(&tmp0, vecview[0], cos(zrot));
+
+    vCross(&tmp1, vecview[2], vecview[0]);
+    vMulS(&tmp1, tmp1, sin(zrot));
+
+    vMulS(&vecview[0], vecview[2], vDot(vecview[2], vecview[0]) * (1 - cos(zrot)));
+
+    vAdd(&vecview[0], vecview[0], tmp0);
+    vAdd(&vecview[0], vecview[0], tmp1);
+
+    vCross(&vecview[1], vecview[2], vecview[0]);
+
+    vNorm(&vecview[0]);
+    vNorm(&vecview[1]);
+    vNorm(&vecview[2]);
+
+    view = (mat){
+        vecview[0].x, vecview[1].x, vecview[2].x, view.m[0][3],
+        vecview[0].y, vecview[1].y, vecview[2].y, view.m[1][3],
+        vecview[0].z, vecview[1].z, vecview[2].z, view.m[2][3],
+        0, 0, 0, view.m[3][3]
+    };
+
+    // translate
     mTranslate(&view, ppr.x, ppr.y, ppr.z);
 
     static f32 ft = 0.f;
@@ -632,6 +695,11 @@ void main_loop()
             const f32 cs = comets[i].scale+0.06f;
             if(cd < cs*cs)
             {
+                popped++;
+                char title[256];
+                const uint max_damage = exo_numvert/2;
+                sprintf(title, "Online Fractal Attack | %u/%u | %.2f%% | %.2f mins", hits, popped, (100.f/(float)max_damage)*(float)damage, (time(0)-sepoch)/60.0);
+                glfwSetWindowTitle(window, title);
                 comets[i].speed = 0.f;
                 comets[i].dir.x = 1.f;
                 //comets[i].scale *= 2.f;
@@ -799,6 +867,8 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
         else if(key == GLFW_KEY_S){ keystate[3] = 1; }
         else if(key == GLFW_KEY_SPACE){ keystate[4] = 1; }
         else if(key == GLFW_KEY_LEFT_SHIFT){ keystate[5] = 1; }
+        else if(key == GLFW_KEY_Q){ keystate[6] = 1; }
+        else if(key == GLFW_KEY_E){ keystate[7] = 1; }
         else if(key == GLFW_KEY_LEFT_CONTROL){ brake = 1; }
         else if(key == GLFW_KEY_F)
         {
@@ -857,6 +927,8 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
         else if(key == GLFW_KEY_S){ keystate[3] = 0; }
         else if(key == GLFW_KEY_SPACE){ keystate[4] = 0; }
         else if(key == GLFW_KEY_LEFT_SHIFT){ keystate[5] = 0; }
+        else if(key == GLFW_KEY_Q){ keystate[6] = 0; }
+        else if(key == GLFW_KEY_E){ keystate[7] = 0; }
         else if(key == GLFW_KEY_LEFT_CONTROL){ brake = 0; }
     }
 }

@@ -28,7 +28,7 @@ clean:
 	$(RM) fractalattackonline *.o
 
 release: fractalattackonline
-	upx fractalattackonline
+	upx --lzma --best fractalattackonline
 
 install:
 	cp fractalattackonline $(DESTDIR)

@@ -1,2 +1,2 @@
 make -j`nproc`
-./fat
+./fractalattackonline $((`date +%s`+3))
