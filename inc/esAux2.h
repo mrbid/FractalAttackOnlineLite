@@ -345,7 +345,7 @@ const GLchar* f1 =
         "vec3 normal = normalize(vertNorm);\n"
         "vec3 lightDir = normalize(vlightPos - vertPos);\n"
         "float lambertian = max(dot(lightDir, normal), 0.0);\n"
-        "gl_FragColor = vec4((ambientColor + lambertian*diffuseColor) * (1.0 - (length(vertPos)*0.09)), vertOpa);\n"
+        "gl_FragColor = vec4((ambientColor + lambertian*diffuseColor) * clamp(1.0 - (length(vertPos)*0.09), 0.0, 1.0), vertOpa);\n" // mod
     "}\n";
 
 const GLchar* f11 = // no ambient light
