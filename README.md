@@ -1,4 +1,4 @@
-# FractalAttackOnline
+# FractalAttackOnlineLite
 ### Defend the planet until it reaches 100% damage!
 *Play with upto 32 players online.*
 
