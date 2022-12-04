@@ -483,14 +483,14 @@ void main_loop()
                 zrot = 0.f;
         }
     }
-    if(pmod < 1.14f) // exo collision
+    if(pmod < 1.13f) // exo collision
     {
         const f32 hf = vMod(pp)*10.f;
         vec n = ppr;
         vNorm(&n);
          vReflect(&pp, pp, (vec){-n.x, -n.y, -n.z}); // better if I don't normalise pp
          vMulS(&pp, pp, 0.3f);
-        vMulS(&n, n, 1.14f - pmod);
+        vMulS(&n, n, 1.13f - pmod);
         vAdd(&ppr, ppr, n);
     }
 
