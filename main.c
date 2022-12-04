@@ -250,7 +250,7 @@ void incrementHits()
     hits++;
     char title[256];
     const uint max_damage = exo_numvert/2;
-    sprintf(title, "Online Fractal Attack | %u/%u | %.2f%% | %.2f mins", hits, popped, (100.f/(float)max_damage)*(float)damage, (time(0)-sepoch)/60.0);
+    sprintf(title, "Online Fractal Attack Lite | %u/%u | %.2f%% | %.2f mins", hits, popped, (100.f/(float)max_damage)*(float)damage, (time(0)-sepoch)/60.0);
     glfwSetWindowTitle(window, title);
 
     if(damage >= max_damage)
@@ -261,7 +261,7 @@ void incrementHits()
             comets[i].rot = 0.f;
         }
 
-        sprintf(title, "Online Fractal Attack | %u/%u | 100%% | %.2f mins | GAME END", hits, popped, (time(0)-sepoch)/60.0);
+        sprintf(title, "Online Fractal Attack Lite | %u/%u | 100%% | %.2f mins | GAME END", hits, popped, (time(0)-sepoch)/60.0);
         glfwSetWindowTitle(window, title);
     }
 }
@@ -698,7 +698,7 @@ void main_loop()
                 popped++;
                 char title[256];
                 const uint max_damage = exo_numvert/2;
-                sprintf(title, "Online Fractal Attack | %u/%u | %.2f%% | %.2f mins", hits, popped, (100.f/(float)max_damage)*(float)damage, (time(0)-sepoch)/60.0);
+                sprintf(title, "Online Fractal Attack Lite | %u/%u | %.2f%% | %.2f mins", hits, popped, (100.f/(float)max_damage)*(float)damage, (time(0)-sepoch)/60.0);
                 glfwSetWindowTitle(window, title);
                 comets[i].speed = 0.f;
                 comets[i].dir.x = 1.f;
@@ -969,14 +969,14 @@ int main(int argc, char** argv)
 
     // help
     printf("----\n");
-    printf("Online Fractal Attack\n");
+    printf("Online Fractal Attack Lite\n");
     printf("----\n");
     printf("James William Fletcher (github.com/mrbid)\n");
     printf("----\n");
     printf("Argv(2): start epoch, msaa 0-16\n");
     printf("F = FPS to console.\n");
     printf("I = Toggle player lag extrapolation.\n");
-    printf("W, A, S, D, SPACE, LEFT SHIFT\n");
+    printf("W, A, S, D, Q, E, SPACE, LEFT SHIFT\n");
     printf("L-CTRL / Right Click to Brake.\n");
     printf("Escape / Left Click to free mouse focus.\n");
     printf("----\n");
@@ -1217,7 +1217,7 @@ int main(int argc, char** argv)
         sprintf(title, "Please wait... %lu seconds. Total players waiting %u.", sepoch-time(0), wp+1);
         glfwSetWindowTitle(window, title);
     }
-    glfwSetWindowTitle(window, "Online Fractal Attack");
+    glfwSetWindowTitle(window, "Online Fractal Attack Lite");
     window_size_callback(window, winw, winh);
 
     // seed random
