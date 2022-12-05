@@ -148,6 +148,7 @@ uint brake = 0;
 uint damage = 0;
 time_t sepoch = 0;
 unsigned short uid = 0;
+uint autoroll = 1;
 
 #define MAX_PLAYERS 31
 float players[MAX_PLAYERS*3] = {0};
@@ -434,7 +435,7 @@ void main_loop()
     vAdd(&ppr, ppr, ppi);
 
     const f32 pmod = vMod(ppr);
-    if(pmod < 2.f) // self-righting
+    if(autoroll == 1 && pmod < 2.f) // self-righting
     {
         vec dve = (vec){view.m[0][0], view.m[1][0], view.m[2][0]};
         vec dvp = ppr;
@@ -918,6 +919,11 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
             else
                 printf("Player extrapolation off.\n");
         }
+        else if(key == GLFW_KEY_R)
+        {
+            autoroll = 1 - autoroll;
+            printf("autoroll: %u\n", autoroll);
+        }
     }
     else if(action == GLFW_RELEASE)
     {
@@ -976,6 +982,7 @@ int main(int argc, char** argv)
     printf("Argv(2): start epoch, msaa 0-16\n");
     printf("F = FPS to console.\n");
     printf("I = Toggle player lag extrapolation.\n");
+    printf("R = Toggle auto-tilt around planet.\n");
     printf("W, A, S, D, Q, E, SPACE, LEFT SHIFT\n");
     printf("L-CTRL / Right Click to Brake.\n");
     printf("Escape / Left Click to free mouse focus.\n");
