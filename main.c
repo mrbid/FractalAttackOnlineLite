@@ -391,7 +391,7 @@ void main_loop()
     }
     else if(keystate[3] == 1) // S
     {
-        vec vdc = (vec){view.m[0][2], view.m[0][2], view.m[2][2]};
+        vec vdc = (vec){view.m[0][2], view.m[1][2], view.m[2][2]};
         vec m;
         vMulS(&m, vdc, MOVE_SPEED * dt);
         vSub(&pp, pp, m);
