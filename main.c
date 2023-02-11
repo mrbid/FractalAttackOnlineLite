@@ -504,9 +504,12 @@ void main_loop()
     if(focus_cursor == 1)
     {
         glfwGetCursorPos(window, &x, &y);
-        xrot = (ww2-x)*sens;
-        yrot = (wh2-y)*sens;
-        glfwSetCursorPos(window, ww2, wh2);
+        if(x != ww2 || y != wh2)
+        {
+            xrot = (ww2-x)*sens;
+            yrot = (wh2-y)*sens;
+            glfwSetCursorPos(window, ww2, wh2);
+        }
     }
 
     // Test_User angle-axis rotation
