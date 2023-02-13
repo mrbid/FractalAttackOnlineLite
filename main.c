@@ -784,11 +784,11 @@ void main_loop()
         if(comets[i].speed == 0.f)
         {
             glEnable(GL_BLEND);
-            glDrawElements(GL_TRIANGLES, rock1_numind, GL_UNSIGNED_SHORT, 0);
+            glDrawElements(GL_TRIANGLES, rock1_numind, GL_UNSIGNED_BYTE, 0);
             glDisable(GL_BLEND);
         }
         else
-            glDrawElements(GL_TRIANGLES, rock1_numind, GL_UNSIGNED_SHORT, 0);
+            glDrawElements(GL_TRIANGLES, rock1_numind, GL_UNSIGNED_BYTE, 0);
     }
 
     // players
@@ -827,7 +827,7 @@ void main_loop()
             mScale(&model, 0.01f, 0.01f, 0.01f);
             mMul(&modelview, &model, &view);
             glUniformMatrix4fv(modelview_id, 1, GL_FALSE, (f32*) &modelview.m[0][0]);
-            glDrawElements(GL_TRIANGLES, rock1_numind, GL_UNSIGNED_SHORT, 0);
+            glDrawElements(GL_TRIANGLES, rock1_numind, GL_UNSIGNED_BYTE, 0);
         }
     }
     
