@@ -10,9 +10,6 @@ The PHP server is [fat.php](fat.php).
 
 To start an online game you have to launch as such `./fat <start epoch> <msaa>` the start epoch has to be a future epoch, you can get the current epoch using `date +%s` add 180 seconds to it and tell your friends to also launch using that epoch and you will all endup in the same game. msaa is optional between 0-16.
 
-Ultimately IPv4 UDP at 144hz is the holy grail. 🙇
-- https://notabug.org/FractalAttack/FractalAttackOnlineUDP
-
 #### Single Player version
 - https://snapcraft.io/fractalattack
 - https://github.com/mrbid/FractalAttack
