@@ -279,7 +279,7 @@ void curlUpdateGame(const time_t sepoch, const unsigned short uid)
     unsigned char d[12];
     memcpy(&d, (unsigned char*)&ppr, 12);
     char url[256];
-    sprintf(url, "http://vfcash.co.uk/fat/fat.php?r=%lu&u=%hu&p=%%%02X%%%02X%%%02X%%%02X%%%02X%%%02X%%%02X%%%02X%%%02X%%%02X%%%02X%%%02X", sepoch, uid, d[0], d[1], d[2], d[3], d[4], d[5], d[6], d[7], d[8], d[9], d[10], d[11]);
+    sprintf(url, "https://fractalattack.repl.co/?r=%lu&u=%hu&p=%%%02X%%%02X%%%02X%%%02X%%%02X%%%02X%%%02X%%%02X%%%02X%%%02X%%%02X%%%02X", sepoch, uid, d[0], d[1], d[2], d[3], d[4], d[5], d[6], d[7], d[8], d[9], d[10], d[11]);
     //printf("%s\n", url);
     curl_easy_setopt(curl, CURLOPT_URL, url);
     curl_easy_setopt(curl, CURLOPT_TIMEOUT_MS, UPDATE_TIMEOUT_MS);
@@ -290,7 +290,7 @@ void curlRegisterGame(const time_t sepoch, const unsigned short uid)
 {
     // might want to add a cache buster to the url
     char url[256];
-    sprintf(url, "http://vfcash.co.uk/fat/fat.php?r=%lu&u=%hu", sepoch, uid);
+    sprintf(url, "https://fractalattack.repl.co/?r=%lu&u=%hu", sepoch, uid);
     curl_easy_setopt(curl, CURLOPT_URL, url);
     curl_easy_setopt(curl, CURLOPT_TIMEOUT, time(0)-sepoch);
 
