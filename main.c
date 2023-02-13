@@ -374,12 +374,6 @@ void main_loop()
 // keystates
 //*************************************
 
-    vec vecview[3] = {
-        {view.m[0][0], view.m[1][0], view.m[2][0]}, // r
-        {view.m[0][1], view.m[1][1], view.m[2][1]}, // u
-        {view.m[0][2], view.m[1][2], view.m[2][2]}  // f
-    };
-
     static f32 zrot = 0.f;
 
     if(keystate[2] == 1) // W
@@ -516,6 +510,12 @@ void main_loop()
     // https://en.wikipedia.org/wiki/Axis%E2%80%93angle_representation
     // https://en.wikipedia.org/wiki/Rodrigues%27_rotation_formula
     vec tmp0, tmp1;
+
+    vec vecview[3] = {
+        {view.m[0][0], view.m[1][0], view.m[2][0]}, // r
+        {view.m[0][1], view.m[1][1], view.m[2][1]}, // u
+        {view.m[0][2], view.m[1][2], view.m[2][2]}  // f
+    };
 
     // left/right
     vMulS(&tmp0, vecview[0], cosf(xrot));
