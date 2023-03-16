@@ -19,7 +19,7 @@
             header("HTTP/1.1 200 OK");
             exit;
         }
-        if(strlen($_GET['p']) != 12)
+        if(array_sum(count_chars($_GET['p'])) != 12)
         {
             //echo "wrong size";
             header("HTTP/1.1 200 OK");
